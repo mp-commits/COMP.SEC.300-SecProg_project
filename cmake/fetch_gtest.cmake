@@ -11,3 +11,6 @@ FetchContent_MakeAvailable(googletest)
 
 add_library(GTest::GTest INTERFACE IMPORTED)
 target_link_libraries(GTest::GTest INTERFACE gtest_main)
+
+add_library(GTest::GMock INTERFACE IMPORTED)
+target_link_libraries(GTest::GMock INTERFACE gmock_main)
