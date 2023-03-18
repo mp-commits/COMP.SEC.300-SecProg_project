@@ -45,7 +45,7 @@ AesGcm::AesGcm(const AesGcm_Key256_t& key) : m_keyType(KEY_TYPE_256), m_key(key)
 
 AesGcm::~AesGcm() {}
 
-bool AesGcm::encrypt(const std::vector<uint8_t>& data_in, std::vector<uint8_t>& data_out)
+bool AesGcm::encrypt(const ByteVector_t& data_in, ByteVector_t& data_out)
 {
     if (data_in.size() == 0)
     {
@@ -88,7 +88,7 @@ bool AesGcm::encrypt(const std::vector<uint8_t>& data_in, std::vector<uint8_t>& 
     return (size != 0);
 }
 
-bool AesGcm::decrypt(const std::vector<uint8_t>& data_in, std::vector<uint8_t>& data_out)
+bool AesGcm::decrypt(const ByteVector_t& data_in, ByteVector_t& data_out)
 {
     if (data_in.size() == 0)
     {
@@ -129,8 +129,8 @@ bool AesGcm::decrypt(const std::vector<uint8_t>& data_in, std::vector<uint8_t>& 
 
 std::string AesGcm::encryptString(const std::string& input)
 {
-    std::vector<uint8_t> data_in = StringToVector(input);
-    std::vector<uint8_t> data_out;
+    ByteVector_t data_in = StringToVector(input);
+    ByteVector_t data_out;
 
     encrypt(data_in, data_out);
     return vectorToString(data_out);
@@ -138,14 +138,14 @@ std::string AesGcm::encryptString(const std::string& input)
 
 std::string AesGcm::decryptString(const std::string& input)
 {
-    std::vector<uint8_t> data_in = StringToVector(input);
-    std::vector<uint8_t> data_out;
+    ByteVector_t data_in = StringToVector(input);
+    ByteVector_t data_out;
 
     decrypt(data_in, data_out);
     return vectorToString(data_out);
 }
 
-std::string AesGcm::vectorToString(const std::vector<uint8_t>& data_in)
+std::string AesGcm::vectorToString(const ByteVector_t& data_in)
 {
     std::string result = "";
 
@@ -157,9 +157,9 @@ std::string AesGcm::vectorToString(const std::vector<uint8_t>& data_in)
     return result;
 }
 
-std::vector<uint8_t> AesGcm::StringToVector(const std::string& string_in)
+ByteVector_t AesGcm::StringToVector(const std::string& string_in)
 {
-    std::vector<uint8_t> result;
+    ByteVector_t result;
 
     for (char byte : string_in)
     {

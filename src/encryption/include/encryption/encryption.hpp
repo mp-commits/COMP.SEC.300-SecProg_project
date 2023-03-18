@@ -12,10 +12,10 @@
 #ifndef ENCRYPTION_HPP
 #define ENCRYPTION_HPP
 
-#include <stdint.h>
-#include <vector>
 #include <array>
 #include <string>
+
+#include "bytevector.hpp"
 
 namespace encryption
 {
@@ -30,8 +30,8 @@ public:
     AesGcm(const AesGcm_Key256_t& key);
     ~AesGcm();
 
-    bool encrypt(const std::vector<uint8_t>& data_in, std::vector<uint8_t>& data_out);
-    bool decrypt(const std::vector<uint8_t>& data_in, std::vector<uint8_t>& data_out);
+    bool encrypt(const ByteVector_t& data_in, ByteVector_t& data_out);
+    bool decrypt(const ByteVector_t& data_in, ByteVector_t& data_out);
 
     std::string encryptString(const std::string& input);
     std::string decryptString(const std::string& input);
@@ -51,8 +51,8 @@ private:
         AesGcm_Key256_t k256;
     } m_key;
     
-    std::string vectorToString(const std::vector<uint8_t>& data_in);
-    std::vector<uint8_t> StringToVector(const std::string& string_in);
+    std::string vectorToString(const ByteVector_t& data_in);
+    ByteVector_t StringToVector(const std::string& string_in);
 };
 
 } // namespace encryption

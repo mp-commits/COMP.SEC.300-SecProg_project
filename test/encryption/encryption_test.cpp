@@ -23,7 +23,7 @@ using random_bytes_engine = std::independent_bits_engine<
 
 #define TEST_SUITE_NAME EncryptionTest
 
-static void CompareVectors(const vector<uint8_t>& a, const vector<uint8_t>& b)
+static void CompareVectors(const ByteVector_t& a, const ByteVector_t& b)
 {
     ASSERT_EQ(a.size(), b.size());
 
@@ -35,9 +35,9 @@ static void CompareVectors(const vector<uint8_t>& a, const vector<uint8_t>& b)
 
 TEST(TEST_SUITE_NAME, invalidInput)
 {
-    vector<uint8_t> empty(0);
-    vector<uint8_t> output = {1, 2, 3, 4};
-    const vector<uint8_t> reference(output);
+    ByteVector_t empty(0);
+    ByteVector_t output = {1, 2, 3, 4};
+    const ByteVector_t reference(output);
     AesGcm_Key128_t key;
 
     AesGcm aes(key);
@@ -53,15 +53,15 @@ TEST(TEST_SUITE_NAME, aes128keyEncryptBytesBasic)
 {
     const AesGcm_Key128_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
 
-    const vector<uint8_t> testData = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
-    vector<uint8_t> encryptedData;
+    const ByteVector_t testData = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
+    ByteVector_t encryptedData;
 
     AesGcm crypter(key);
 
     EXPECT_TRUE(crypter.encrypt(testData, encryptedData));
     EXPECT_NE(testData, encryptedData);
 
-    vector<uint8_t> plainData;
+    ByteVector_t plainData;
     EXPECT_TRUE(crypter.decrypt(encryptedData, plainData));
 
     CompareVectors(testData, plainData);
@@ -73,8 +73,8 @@ TEST(TEST_SUITE_NAME, aes128keyEncryptBytesLongData)
     const AesGcm_Key128_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
     AesGcm crypter(key);
 
-    vector<uint8_t> testData(TEST_DATA_LENGTH, 0x00);
-    vector<uint8_t> encryptedData;
+    ByteVector_t testData(TEST_DATA_LENGTH, 0x00);
+    ByteVector_t encryptedData;
 
     random_bytes_engine rbe;
     std::generate(begin(testData), end(testData), std::ref(rbe));
@@ -82,7 +82,7 @@ TEST(TEST_SUITE_NAME, aes128keyEncryptBytesLongData)
     EXPECT_TRUE(crypter.encrypt(testData, encryptedData));
     EXPECT_NE(testData, encryptedData);
 
-    vector<uint8_t> plainData;
+    ByteVector_t plainData;
     EXPECT_TRUE(crypter.decrypt(encryptedData, plainData));
 
     CompareVectors(testData, plainData);
@@ -91,21 +91,21 @@ TEST(TEST_SUITE_NAME, aes128keyEncryptBytesLongData)
 TEST(TEST_SUITE_NAME, aes128keyEncryptBytesMultiInstance)
 {
     const AesGcm_Key128_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
-    const vector<uint8_t> testData = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
-    vector<uint8_t> encryptedData;
+    const ByteVector_t testData = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
+    ByteVector_t encryptedData;
 
     AesGcm encrypter(key);
 
     EXPECT_TRUE(encrypter.encrypt(testData, encryptedData));
     EXPECT_NE(testData, encryptedData);
 
-    vector<uint8_t> plainData;
+    ByteVector_t plainData;
     AesGcm decrypter(key);
     EXPECT_TRUE(decrypter.decrypt(encryptedData, plainData));
 
     CompareVectors(testData, plainData);
 
-    vector<uint8_t> plainData2;
+    ByteVector_t plainData2;
     AesGcm decrypter2(key);
     EXPECT_TRUE(decrypter2.decrypt(encryptedData, plainData2));
 
@@ -118,8 +118,8 @@ TEST(TEST_SUITE_NAME, aes128keyEncryptBytesLongDataMultiInstance)
     const AesGcm_Key128_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
     AesGcm encrypter(key);
 
-    vector<uint8_t> testData(TEST_DATA_LENGTH, 0x00);
-    vector<uint8_t> encryptedData;
+    ByteVector_t testData(TEST_DATA_LENGTH, 0x00);
+    ByteVector_t encryptedData;
 
     random_bytes_engine rbe;
     std::generate(begin(testData), end(testData), std::ref(rbe));
@@ -129,7 +129,7 @@ TEST(TEST_SUITE_NAME, aes128keyEncryptBytesLongDataMultiInstance)
 
     AesGcm decrypter(key);
 
-    vector<uint8_t> plainData;
+    ByteVector_t plainData;
     EXPECT_TRUE(decrypter.decrypt(encryptedData, plainData));
 
     CompareVectors(testData, plainData);
@@ -140,8 +140,8 @@ TEST(TEST_SUITE_NAME, aes128WrongKey)
     const AesGcm_Key128_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
     const AesGcm_Key128_t wrongKey = {0};
 
-    const vector<uint8_t> testData = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
-    vector<uint8_t> encryptedData;
+    const ByteVector_t testData = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
+    ByteVector_t encryptedData;
 
     AesGcm encrypter(key);
     AesGcm decrypter(wrongKey);
@@ -149,7 +149,7 @@ TEST(TEST_SUITE_NAME, aes128WrongKey)
     EXPECT_TRUE(encrypter.encrypt(testData, encryptedData));
     EXPECT_NE(testData, encryptedData);
 
-    vector<uint8_t> plainData;
+    ByteVector_t plainData;
     EXPECT_TRUE(decrypter.decrypt(encryptedData, plainData));
     EXPECT_NE(testData, plainData);
 
@@ -161,15 +161,15 @@ TEST(TEST_SUITE_NAME, aes256keyEncryptBytesBasic)
 {
     const AesGcm_Key256_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
 
-    const vector<uint8_t> testData = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
-    vector<uint8_t> encryptedData;
+    const ByteVector_t testData = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
+    ByteVector_t encryptedData;
 
     AesGcm crypter(key);
 
     EXPECT_TRUE(crypter.encrypt(testData, encryptedData));
     EXPECT_NE(testData, encryptedData);
 
-    vector<uint8_t> plainData;
+    ByteVector_t plainData;
     EXPECT_TRUE(crypter.decrypt(encryptedData, plainData));
 
     CompareVectors(testData, plainData);
@@ -181,8 +181,8 @@ TEST(TEST_SUITE_NAME, aes256keyEncryptBytesLongData)
     const AesGcm_Key256_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
     AesGcm crypter(key);
 
-    vector<uint8_t> testData(TEST_DATA_LENGTH, 0x00);
-    vector<uint8_t> encryptedData;
+    ByteVector_t testData(TEST_DATA_LENGTH, 0x00);
+    ByteVector_t encryptedData;
 
     random_bytes_engine rbe;
     std::generate(begin(testData), end(testData), std::ref(rbe));
@@ -190,7 +190,7 @@ TEST(TEST_SUITE_NAME, aes256keyEncryptBytesLongData)
     EXPECT_TRUE(crypter.encrypt(testData, encryptedData));
     EXPECT_NE(testData, encryptedData);
 
-    vector<uint8_t> plainData;
+    ByteVector_t plainData;
     EXPECT_TRUE(crypter.decrypt(encryptedData, plainData));
 
     CompareVectors(testData, plainData);
@@ -199,21 +199,21 @@ TEST(TEST_SUITE_NAME, aes256keyEncryptBytesLongData)
 TEST(TEST_SUITE_NAME, aes256keyEncryptBytesMultiInstance)
 {
     const AesGcm_Key256_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
-    const vector<uint8_t> testData = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
-    vector<uint8_t> encryptedData;
+    const ByteVector_t testData = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
+    ByteVector_t encryptedData;
 
     AesGcm encrypter(key);
 
     EXPECT_TRUE(encrypter.encrypt(testData, encryptedData));
     EXPECT_NE(testData, encryptedData);
 
-    vector<uint8_t> plainData;
+    ByteVector_t plainData;
     AesGcm decrypter(key);
     EXPECT_TRUE(decrypter.decrypt(encryptedData, plainData));
 
     CompareVectors(testData, plainData);
 
-    vector<uint8_t> plainData2;
+    ByteVector_t plainData2;
     AesGcm decrypter2(key);
     EXPECT_TRUE(decrypter2.decrypt(encryptedData, plainData2));
 
@@ -226,8 +226,8 @@ TEST(TEST_SUITE_NAME, aes256keyEncryptBytesLongDataMultiInstance)
     const AesGcm_Key256_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
     AesGcm encrypter(key);
 
-    vector<uint8_t> testData(TEST_DATA_LENGTH, 0x00);
-    vector<uint8_t> encryptedData;
+    ByteVector_t testData(TEST_DATA_LENGTH, 0x00);
+    ByteVector_t encryptedData;
 
     random_bytes_engine rbe;
     std::generate(begin(testData), end(testData), std::ref(rbe));
@@ -237,7 +237,7 @@ TEST(TEST_SUITE_NAME, aes256keyEncryptBytesLongDataMultiInstance)
 
     AesGcm decrypter(key);
 
-    vector<uint8_t> plainData;
+    ByteVector_t plainData;
     EXPECT_TRUE(decrypter.decrypt(encryptedData, plainData));
 
     CompareVectors(testData, plainData);
@@ -248,8 +248,8 @@ TEST(TEST_SUITE_NAME, aes256WrongKey)
     const AesGcm_Key256_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
     const AesGcm_Key256_t wrongKey = {0};
 
-    const vector<uint8_t> testData = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
-    vector<uint8_t> encryptedData;
+    const ByteVector_t testData = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
+    ByteVector_t encryptedData;
 
     AesGcm encrypter(key);
     AesGcm decrypter(wrongKey);
@@ -257,7 +257,7 @@ TEST(TEST_SUITE_NAME, aes256WrongKey)
     EXPECT_TRUE(encrypter.encrypt(testData, encryptedData));
     EXPECT_NE(testData, encryptedData);
 
-    vector<uint8_t> plainData;
+    ByteVector_t plainData;
     EXPECT_TRUE(decrypter.decrypt(encryptedData, plainData));
     EXPECT_NE(testData, plainData);
 

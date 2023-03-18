@@ -4,5 +4,7 @@ project(SECURE_PROGRAMMING_PASSWORD_MANAGER)
 enable_testing()
 include(cmake/fetch_gtest.cmake)
 
+set(COMMON_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/common/include)
+
 add_subdirectory(src)
 add_subdirectory(test)

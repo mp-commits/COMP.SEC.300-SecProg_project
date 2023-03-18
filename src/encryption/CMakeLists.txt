@@ -10,6 +10,7 @@ add_library(encryption-static
 target_include_directories(encryption-static 
     PUBLIC 
         include
+        ${COMMON_INCLUDE_DIR}
 )
 
 target_link_libraries(encryption-static 
