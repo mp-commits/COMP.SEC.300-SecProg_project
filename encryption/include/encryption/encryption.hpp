@@ -15,6 +15,7 @@
 #include <stdint.h>
 #include <vector>
 #include <array>
+#include <string>
 
 namespace encryption
 {
@@ -30,6 +31,10 @@ public:
     ~AesGcm();
 
     bool encrypt(const std::vector<uint8_t>& data_in, std::vector<uint8_t>& data_out);
+    bool decrypt(const std::vector<uint8_t>& data_in, std::vector<uint8_t>& data_out);
+
+    std::string encryptString(const std::string& input);
+    std::string decryptString(const std::string& input);
 
 private:
     const enum
@@ -38,7 +43,7 @@ private:
         KEY_TYPE_256
     } m_keyType;
     
-    union key
+    const union key
     {
         key(AesGcm_Key128_t k) : k128(k) {}
         key(AesGcm_Key256_t k) : k256(k) {}
@@ -46,6 +51,8 @@ private:
         AesGcm_Key256_t k256;
     } m_key;
     
+    std::string vectorToString(const std::vector<uint8_t>& data_in);
+    std::vector<uint8_t> StringToVector(const std::string& string_in);
 };
 
 } // namespace encryption
