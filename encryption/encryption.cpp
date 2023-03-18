@@ -1,5 +1,5 @@
 /**
- * @file encryption.hpp
+ * @file encryption.cpp
  * @author Mikael Penttinen
  * @brief 
  * @version 0.1
@@ -29,19 +29,19 @@ static void InitSSL()
     }
 }
 
-Crypter::Crypter(CrypterKey128_t& key) : m_keyType(KEY_TYPE_128), m_key128(key), m_key256()
+AesGcm::AesGcm(AesGcm_Key128_t& key) : m_keyType(KEY_TYPE_128), m_key(key)
 {
     InitSSL();
 }
 
-Crypter::Crypter(CrypterKey256_t& key) : m_keyType(KEY_TYPE_256), m_key128(), m_key256(key)
+AesGcm::AesGcm(AesGcm_Key256_t& key) : m_keyType(KEY_TYPE_256), m_key(key)
 {
     InitSSL();
 }
 
-Crypter::~Crypter() {}
+AesGcm::~AesGcm() {}
 
-bool Crypter::encrypt(const std::vector<uint8_t>& data_in, std::vector<uint8_t>& data_out)
+bool AesGcm::encrypt(const std::vector<uint8_t>& data_in, std::vector<uint8_t>& data_out)
 {
     size_t enc_length = data_in.size() * 3;
     data_out.resize(enc_length, 0x00);
