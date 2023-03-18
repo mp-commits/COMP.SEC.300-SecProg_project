@@ -17,6 +17,10 @@
 
 using namespace encryption;
 
+#define IV_SIZE (AES_BLOCK_SIZE)
+#define TAG_SIZE (AES_BLOCK_SIZE)
+#define HEADER_SIZE (IV_SIZE + TAG_SIZE)
+
 static bool f_ssl_init_done = false;
 
 static void InitSSL()
@@ -29,12 +33,12 @@ static void InitSSL()
     }
 }
 
-AesGcm::AesGcm(AesGcm_Key128_t& key) : m_keyType(KEY_TYPE_128), m_key(key)
+AesGcm::AesGcm(const AesGcm_Key128_t& key) : m_keyType(KEY_TYPE_128), m_key(key)
 {
     InitSSL();
 }
 
-AesGcm::AesGcm(AesGcm_Key256_t& key) : m_keyType(KEY_TYPE_256), m_key(key)
+AesGcm::AesGcm(const AesGcm_Key256_t& key) : m_keyType(KEY_TYPE_256), m_key(key)
 {
     InitSSL();
 }
@@ -51,11 +55,11 @@ bool AesGcm::encrypt(const std::vector<uint8_t>& data_in, std::vector<uint8_t>& 
     size_t enc_length = data_in.size() * 3;
     data_out.resize(enc_length, 0x00);
 
-    uint8_t tag[AES_BLOCK_SIZE];
-    uint8_t iv[AES_BLOCK_SIZE];
+    uint8_t tag[TAG_SIZE];
+    uint8_t iv[IV_SIZE];
 
     RAND_bytes(iv, sizeof(iv));
-    std::copy(iv, iv+16, data_out.begin()+16);
+    std::copy(iv, iv+IV_SIZE, data_out.begin()+IV_SIZE);
 
     int size = 0;
     int finalSize = 0;
@@ -71,17 +75,17 @@ bool AesGcm::encrypt(const std::vector<uint8_t>& data_in, std::vector<uint8_t>& 
         EVP_EncryptInit(cipher, EVP_aes_256_gcm(), m_key.k256.data(), iv);
     }
 
-    EVP_EncryptUpdate(cipher, &data_out.data()[32], &size, data_in.data(), data_in.size());
-    EVP_EncryptFinal(cipher, &data_out.data()[32+size], &finalSize);
+    EVP_EncryptUpdate(cipher, &data_out.data()[HEADER_SIZE], &size, data_in.data(), data_in.size());
+    EVP_EncryptFinal(cipher, &data_out.data()[HEADER_SIZE+size], &finalSize);
     EVP_CIPHER_CTX_ctrl(cipher, EVP_CTRL_GCM_GET_TAG, 16, tag);
 
-    std::copy( tag, tag+16, data_out.begin());
-    std::copy(iv, iv+16, data_out.begin()+16);
-    data_out.resize(32 + size + finalSize);
+    std::copy( tag, tag+TAG_SIZE, data_out.begin());
+    std::copy(iv, iv+IV_SIZE, data_out.begin()+IV_SIZE);
+    data_out.resize(HEADER_SIZE + size + finalSize);
 
     EVP_CIPHER_CTX_free(cipher);
 
-    return (size != 0) && (finalSize != 0);
+    return (size != 0);
 }
 
 bool AesGcm::decrypt(const std::vector<uint8_t>& data_in, std::vector<uint8_t>& data_out)
@@ -96,8 +100,8 @@ bool AesGcm::decrypt(const std::vector<uint8_t>& data_in, std::vector<uint8_t>& 
     uint8_t tag[AES_BLOCK_SIZE];
     uint8_t iv[AES_BLOCK_SIZE];
 
-    std::copy(data_in.begin(), data_in.begin()+16, tag);
-    std::copy(data_in.begin()+16, data_in.begin()+32, iv);
+    std::copy(data_in.begin(), data_in.begin()+TAG_SIZE, tag);
+    std::copy(data_in.begin()+TAG_SIZE, data_in.begin()+TAG_SIZE+IV_SIZE, iv);
 
     int size = 0;
     int finalSize = 0;
@@ -113,14 +117,14 @@ bool AesGcm::decrypt(const std::vector<uint8_t>& data_in, std::vector<uint8_t>& 
         EVP_DecryptInit(cipher, EVP_aes_256_gcm(), m_key.k256.data(), iv);
     }
 
-    EVP_DecryptUpdate(cipher, data_out.data(), &size, &data_in.data()[32], data_in.size() - 32);
+    EVP_DecryptUpdate(cipher, data_out.data(), &size, &data_in.data()[HEADER_SIZE], data_in.size() - HEADER_SIZE);
     EVP_CIPHER_CTX_ctrl(cipher, EVP_CTRL_GCM_SET_TAG, 16, tag);
     EVP_DecryptFinal(cipher, &data_out.data()[size], &finalSize);
     EVP_CIPHER_CTX_free(cipher);
 
     data_out.resize(size + finalSize, 0x00);
 
-    return (size != 0) && (finalSize != 0);
+    return (size != 0);
 }
 
 std::string AesGcm::encryptString(const std::string& input)

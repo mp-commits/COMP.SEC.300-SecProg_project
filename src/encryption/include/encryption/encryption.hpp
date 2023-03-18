@@ -26,8 +26,8 @@ typedef std::array<uint8_t, 32> AesGcm_Key256_t;
 class AesGcm 
 {
 public:
-    AesGcm(AesGcm_Key128_t& key);
-    AesGcm(AesGcm_Key256_t& key);
+    AesGcm(const AesGcm_Key128_t& key);
+    AesGcm(const AesGcm_Key256_t& key);
     ~AesGcm();
 
     bool encrypt(const std::vector<uint8_t>& data_in, std::vector<uint8_t>& data_out);
