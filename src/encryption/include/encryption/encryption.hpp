@@ -20,15 +20,17 @@
 namespace encryption
 {
 
-typedef std::array<uint8_t, 16> AesGcm_Key128_t;
-typedef std::array<uint8_t, 32> AesGcm_Key256_t;
+typedef std::array<uint8_t, 16> AESGCM_Key128_t;
+typedef std::array<uint8_t, 24> AESGCM_Key192_t;
+typedef std::array<uint8_t, 32> AESGCM_Key256_t;
 
-class AesGcm 
+class AESGCM 
 {
 public:
-    AesGcm(const AesGcm_Key128_t& key);
-    AesGcm(const AesGcm_Key256_t& key);
-    ~AesGcm();
+    AESGCM(const AESGCM_Key128_t& key);
+    AESGCM(const AESGCM_Key192_t& key);
+    AESGCM(const AESGCM_Key256_t& key);
+    ~AESGCM();
 
     bool encrypt(const ByteVector_t& data_in, ByteVector_t& data_out);
     bool decrypt(const ByteVector_t& data_in, ByteVector_t& data_out);
@@ -40,19 +42,19 @@ private:
     const enum
     {
         KEY_TYPE_128,
+        KEY_TYPE_192,
         KEY_TYPE_256
     } m_keyType;
     
     const union key
     {
-        key(AesGcm_Key128_t k) : k128(k) {}
-        key(AesGcm_Key256_t k) : k256(k) {}
-        AesGcm_Key128_t k128;
-        AesGcm_Key256_t k256;
+        key(AESGCM_Key128_t k) : k128(k) {}
+        key(AESGCM_Key192_t k) : k192(k) {}
+        key(AESGCM_Key256_t k) : k256(k) {}
+        AESGCM_Key128_t k128;
+        AESGCM_Key192_t k192;
+        AESGCM_Key256_t k256;
     } m_key;
-    
-    std::string vectorToString(const ByteVector_t& data_in);
-    ByteVector_t StringToVector(const std::string& string_in);
 };
 
 } // namespace encryption

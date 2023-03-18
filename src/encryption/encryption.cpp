@@ -10,12 +10,15 @@
  */
 
 #include "encryption/encryption.hpp"
+#include "encryption/util.hpp"
 
 #include <openssl/aes.h>
 #include <openssl/evp.h>
 #include <openssl/rand.h>
 
 using namespace encryption;
+using namespace encryptionUtil;
+
 
 #define IV_SIZE (AES_BLOCK_SIZE)
 #define TAG_SIZE (AES_BLOCK_SIZE)
@@ -33,19 +36,24 @@ static void InitSSL()
     }
 }
 
-AesGcm::AesGcm(const AesGcm_Key128_t& key) : m_keyType(KEY_TYPE_128), m_key(key)
+AESGCM::AESGCM(const AESGCM_Key128_t& key) : m_keyType(KEY_TYPE_128), m_key(key)
 {
     InitSSL();
 }
 
-AesGcm::AesGcm(const AesGcm_Key256_t& key) : m_keyType(KEY_TYPE_256), m_key(key)
+AESGCM::AESGCM(const AESGCM_Key192_t& key) : m_keyType(KEY_TYPE_192), m_key(key)
 {
     InitSSL();
 }
 
-AesGcm::~AesGcm() {}
+AESGCM::AESGCM(const AESGCM_Key256_t& key) : m_keyType(KEY_TYPE_256), m_key(key)
+{
+    InitSSL();
+}
 
-bool AesGcm::encrypt(const ByteVector_t& data_in, ByteVector_t& data_out)
+AESGCM::~AESGCM() {}
+
+bool AESGCM::encrypt(const ByteVector_t& data_in, ByteVector_t& data_out)
 {
     if (data_in.size() == 0)
     {
@@ -70,6 +78,10 @@ bool AesGcm::encrypt(const ByteVector_t& data_in, ByteVector_t& data_out)
     {
         EVP_EncryptInit(cipher, EVP_aes_128_gcm(), m_key.k128.data(), iv);
     }
+    else if (m_keyType == KEY_TYPE_192)
+    {
+        EVP_EncryptInit(cipher, EVP_aes_192_gcm(), m_key.k192.data(), iv);
+    }
     else
     {
         EVP_EncryptInit(cipher, EVP_aes_256_gcm(), m_key.k256.data(), iv);
@@ -88,7 +100,7 @@ bool AesGcm::encrypt(const ByteVector_t& data_in, ByteVector_t& data_out)
     return (size != 0);
 }
 
-bool AesGcm::decrypt(const ByteVector_t& data_in, ByteVector_t& data_out)
+bool AESGCM::decrypt(const ByteVector_t& data_in, ByteVector_t& data_out)
 {
     if (data_in.size() == 0)
     {
@@ -112,6 +124,10 @@ bool AesGcm::decrypt(const ByteVector_t& data_in, ByteVector_t& data_out)
     {
         EVP_DecryptInit(cipher, EVP_aes_128_gcm(), m_key.k128.data(), iv);
     }
+    else if (m_keyType == KEY_TYPE_192)
+    {
+        EVP_DecryptInit(cipher, EVP_aes_192_gcm(), m_key.k128.data(), iv);
+    }
     else
     {
         EVP_DecryptInit(cipher, EVP_aes_256_gcm(), m_key.k256.data(), iv);
@@ -127,7 +143,7 @@ bool AesGcm::decrypt(const ByteVector_t& data_in, ByteVector_t& data_out)
     return (size != 0);
 }
 
-std::string AesGcm::encryptString(const std::string& input)
+std::string AESGCM::encryptString(const std::string& input)
 {
     ByteVector_t data_in = StringToVector(input);
     ByteVector_t data_out;
@@ -136,35 +152,11 @@ std::string AesGcm::encryptString(const std::string& input)
     return vectorToString(data_out);
 }
 
-std::string AesGcm::decryptString(const std::string& input)
+std::string AESGCM::decryptString(const std::string& input)
 {
     ByteVector_t data_in = StringToVector(input);
     ByteVector_t data_out;
 
     decrypt(data_in, data_out);
     return vectorToString(data_out);
-}
-
-std::string AesGcm::vectorToString(const ByteVector_t& data_in)
-{
-    std::string result = "";
-
-    for (uint8_t byte : data_in)
-    {
-        result.push_back(byte);
-    }
-
-    return result;
-}
-
-ByteVector_t AesGcm::StringToVector(const std::string& string_in)
-{
-    ByteVector_t result;
-
-    for (char byte : string_in)
-    {
-        result.push_back(byte);
-    }
-
-    return result;
 }
