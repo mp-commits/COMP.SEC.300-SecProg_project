@@ -1,6 +1,6 @@
-project(fileops)
+project(cli)
 
-add_library(${PROJECT_NAME}-static STATIC cryptfile.cpp inputfile.cpp)
+add_library(${PROJECT_NAME}-static STATIC cli.cpp)
 
 target_include_directories(${PROJECT_NAME}-static
     PUBLIC
@@ -9,5 +9,5 @@ target_include_directories(${PROJECT_NAME}-static
 
 target_link_libraries(${PROJECT_NAME}-static 
     PRIVATE
-        encryption-static
+        manager_operations-static
 )

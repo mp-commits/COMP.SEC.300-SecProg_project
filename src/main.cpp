@@ -11,7 +11,7 @@
 
 #include <iostream>
 #include <string>
-#include "encryption/encryption.hpp"
+#include "cli/cli.hpp"
 
 using std::string;
 using std::cout;
