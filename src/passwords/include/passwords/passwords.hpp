@@ -14,6 +14,7 @@
 
 #include <stdint.h>
 #include <string>
+#include <vector>
 
 namespace passwords {
 
@@ -27,18 +28,48 @@ public:
     m_username(username),
     m_password(password),
     m_guid(guid){}
-    
+
     ~Login() {}
 
-    std::string GetUrl() {return m_url;}
-    std::string GetUsername() {return m_username;}
-    std::string GetPassword() {return m_password;}
-    std::string GetGuid() {return m_guid;}
+    std::string GetUrl() 
+    {
+        return m_url;
+    }
 
-    void SetUrl(const std::string& val) noexcept {m_url = val;}
-    void SetUsername(const std::string& val) noexcept {m_username = val;}
-    void SetPassword(const std::string& val) noexcept {m_password = val;}
-    void SetGuid(const std::string& val) noexcept {m_guid = val;}
+    std::string GetUsername() 
+    {
+        return m_username;
+    }
+
+    std::string GetPassword() 
+    {
+        return m_password;
+    }
+
+    std::string GetGuid() 
+    {
+        return m_guid;
+    }
+
+    void SetUrl(const std::string& val) noexcept 
+    {
+        m_url = val;
+    }
+
+    void SetUsername(const std::string& val) noexcept 
+    {
+        m_username = val;
+    }
+
+    void SetPassword(const std::string& val) noexcept 
+    {
+        m_password = val;
+    }
+
+    void SetGuid(const std::string& val) noexcept 
+    {
+        m_guid = val;
+    }
 
     bool operator==(const Login& rhs)
     {
@@ -56,9 +87,31 @@ class PasswordManager {
 public:
     PasswordManager();
     ~PasswordManager();
-    
-private:
 
+    void RemoveLogin(const std::string& guid);
+
+    void AddLogin(const Login& login) 
+    {
+        m_logins.push_back(login);
+    }
+
+    size_t Count() 
+    {
+        return m_logins.size();
+    }
+
+    void Clear() 
+    {
+        m_logins.clear();
+    }
+
+    Login& operator[](int index)
+    {
+        return m_logins[index];
+    }
+
+private:
+    std::vector<Login> m_logins;
 };
 
 } // namespace passwords
