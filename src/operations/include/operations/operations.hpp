@@ -22,5 +22,6 @@ extern void OPERATIONS_RunLoadPasswords(passwords::PasswordManager& manager, Ope
 extern void OPERATIONS_RunSavePasswords(passwords::PasswordManager& manager, OperationArgs_t args = {});
 extern void OPERATIONS_RunAddPassword(passwords::PasswordManager& manager, OperationArgs_t args = {});
 extern void OPERATIONS_RunFindPassword(passwords::PasswordManager& manager, OperationArgs_t args = {});
+extern void OPERATIONS_RunViewPasswords(passwords::PasswordManager& manager, OperationArgs_t args = {});
 
 #endif

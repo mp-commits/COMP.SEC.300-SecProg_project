@@ -20,6 +20,12 @@ namespace passwords {
 
 class Login {
 public:
+    Login() :
+    m_url(""),
+    m_username(""),
+    m_password(""),
+    m_guid(""){}
+
     Login(std::string url,
           std::string username,
           std::string password,
@@ -29,24 +35,32 @@ public:
     m_password(password),
     m_guid(guid){}
 
+    Login(std::string url,
+        std::string username,
+        std::string password) :
+    m_url(url),
+    m_username(username),
+    m_password(password),
+    m_guid(""){}
+
     ~Login() {}
 
-    std::string GetUrl() 
+    std::string GetUrl() const
     {
         return m_url;
     }
 
-    std::string GetUsername() 
+    std::string GetUsername() const
     {
         return m_username;
     }
 
-    std::string GetPassword() 
+    std::string GetPassword() const
     {
         return m_password;
     }
 
-    std::string GetGuid() 
+    std::string GetGuid() const
     {
         return m_guid;
     }

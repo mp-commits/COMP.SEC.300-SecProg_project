@@ -21,11 +21,37 @@ using namespace std;
 #define CLI_ARG_DELIM " "
 #define CLI_ERROR_MESSAGE(line) ("Invalid input: '" + line + "'")
 
-#define COMMAND_ADD "add"
+#define COMMAND_ADD  "add"
 #define COMMAND_EXIT "exit"
 #define COMMAND_FIND "find"
+#define COMMAND_HELP "help"
 #define COMMAND_LOAD "load"
 #define COMMAND_SAVE "save"
+#define COMMAND_VIEW "view"
+
+static bool MatchCommand(const string& input, const string command)
+{
+    if (input.size() == 1U)
+    {
+        return input[0] == command[0];
+    }
+    else
+    {
+        return input == command;
+    }
+}
+
+static void DisplayHelp()
+{
+    cout << "Commands:" << endl;
+    cout << COMMAND_ADD << endl;
+    cout << COMMAND_EXIT << endl;
+    cout << COMMAND_FIND << endl;
+    cout << COMMAND_HELP << endl;
+    cout << COMMAND_LOAD << endl;
+    cout << COMMAND_SAVE << endl;
+    cout << COMMAND_VIEW << endl;
+}
 
 static OperationArgs_t GetArgs(string s, string delimiter)
 {
@@ -68,22 +94,30 @@ void CLI_RunCli(passwords::PasswordManager& manager)
 
         string command = args[0];
 
-        if (command == COMMAND_EXIT)
+        if (MatchCommand(command, COMMAND_EXIT))
         {
             OPERATIONS_RunSavePasswords(manager);
             exit = true;
         }
-        else if (command == COMMAND_SAVE)
+        else if (MatchCommand(command, COMMAND_SAVE))
         {
             OPERATIONS_RunSavePasswords(manager);
         }
-        else if (command == COMMAND_ADD)
+        else if (MatchCommand(command, COMMAND_ADD))
         {
             OPERATIONS_RunAddPassword(manager);
         }
-        else if (command == COMMAND_FIND)
+        else if (MatchCommand(command, COMMAND_FIND))
         {
             OPERATIONS_RunFindPassword(manager, args);
+        }
+        else if (MatchCommand(command, COMMAND_VIEW))
+        {
+            OPERATIONS_RunViewPasswords(manager, args);
+        }
+        else if (MatchCommand(command, COMMAND_HELP))
+        {
+            DisplayHelp();
         }
         else
         {

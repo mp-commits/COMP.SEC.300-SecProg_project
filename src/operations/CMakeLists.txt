@@ -6,6 +6,7 @@ add_library(${PROJECT_NAME}-static
         find.cpp
         load.cpp
         save.cpp
+        view.cpp
 )
 
 target_include_directories(${PROJECT_NAME}-static 
