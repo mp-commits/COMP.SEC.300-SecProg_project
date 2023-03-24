@@ -10,3 +10,32 @@
  */
 
 #include "cryptfile/cryptfile.hpp"
+
+using namespace std;
+using namespace fileops;
+
+CryptFile::CryptFile(encryption::AESGCM& aes, std::fstream& file) : m_aes(aes), m_file(file)
+{
+    m_file.seekg(ios_base::beg);
+}
+
+CryptFile::~CryptFile()
+{
+
+}
+
+bool CryptFile::Load(passwords::PasswordManager& manager)
+{
+    return false;
+}
+
+bool CryptFile::Save(passwords::PasswordManager& manager)
+{
+    return false;
+}
+
+bool CryptFile::Verify(ByteVector_t& data)
+{
+    (void)data;
+    return true;
+}

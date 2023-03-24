@@ -12,16 +12,27 @@
 #ifndef CRYPTFILE_HPP
 #define CRYPTFILE_HPP
 
+#include <fstream>
+#include "encryption/encryption.hpp"
+#include "passwords/passwords.hpp"
+#include "bytevector.hpp"
+
 namespace fileops {
 
 class CryptFile 
 {
 public:
-    CryptFile();
+    CryptFile(encryption::AESGCM& aes, std::fstream& file);
     ~CryptFile();
 
-private:
+    bool Load(passwords::PasswordManager& manager);
+    bool Save(passwords::PasswordManager& manager);
 
+private:
+    encryption::AESGCM m_aes;
+    std::fstream& m_file;
+
+    bool Verify(ByteVector_t& data);
 };
 
 } // namespace fileops
