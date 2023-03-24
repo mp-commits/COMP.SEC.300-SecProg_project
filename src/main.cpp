@@ -12,12 +12,16 @@
 #include <iostream>
 #include <string>
 #include "cli/cli.hpp"
+#include "passwords/passwords.hpp"
 
 using std::string;
 using std::cout;
+using passwords::PasswordManager;
+
+static PasswordManager f_manager;
 
 int main(int argc, char* argv[])
 {
-    cout << "Hello world" << std::endl;
+    CLI_RunCli(f_manager);
     return 0;
 }

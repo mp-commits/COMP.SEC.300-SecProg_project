@@ -85,8 +85,8 @@ private:
 
 class PasswordManager {
 public:
-    PasswordManager();
-    ~PasswordManager();
+    PasswordManager() : m_logins({}) {} 
+    ~PasswordManager() {}
 
     void RemoveLogin(const std::string& guid);
 

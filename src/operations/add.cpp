@@ -11,7 +11,7 @@
 
 #include "operations/operations.hpp"
 
-void OPERATIONS_RunAddPassword(passwords::PasswordManager& manager)
+void OPERATIONS_RunAddPassword(passwords::PasswordManager& manager, OperationArgs_t args)
 {
     (void)manager;
 }

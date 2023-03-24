@@ -13,10 +13,14 @@
 #define OPERATIONS_HPP
 
 #include "passwords/passwords.hpp"
+#include <string>
+#include <vector>
 
-extern void OPERATIONS_RunLoadPasswords(passwords::PasswordManager& manager);
-extern void OPERATIONS_RunSavePasswords(passwords::PasswordManager& manager);
-extern void OPERATIONS_RunAddPassword(passwords::PasswordManager& manager);
-extern void OPERATIONS_RunFindPassword(passwords::PasswordManager& manager);
+typedef std::vector<std::string> OperationArgs_t;
+
+extern void OPERATIONS_RunLoadPasswords(passwords::PasswordManager& manager, OperationArgs_t args = {});
+extern void OPERATIONS_RunSavePasswords(passwords::PasswordManager& manager, OperationArgs_t args = {});
+extern void OPERATIONS_RunAddPassword(passwords::PasswordManager& manager, OperationArgs_t args = {});
+extern void OPERATIONS_RunFindPassword(passwords::PasswordManager& manager, OperationArgs_t args = {});
 
 #endif

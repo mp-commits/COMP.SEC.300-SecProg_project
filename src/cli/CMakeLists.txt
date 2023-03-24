@@ -7,7 +7,9 @@ target_include_directories(${PROJECT_NAME}-static
         include
 )
 
-target_link_libraries(${PROJECT_NAME}-static 
+target_link_libraries(${PROJECT_NAME}-static
+    PUBLIC
+        passwords-static
     PRIVATE
         manager_operations-static
 )

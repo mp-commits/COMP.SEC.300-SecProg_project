@@ -11,4 +11,7 @@
 
 #include "operations/operations.hpp"
 
-extern void OPERATIONS_RunLoadPasswords(passwords::PasswordManager& manager);
+void OPERATIONS_RunLoadPasswords(passwords::PasswordManager& manager, OperationArgs_t args)
+{
+
+}

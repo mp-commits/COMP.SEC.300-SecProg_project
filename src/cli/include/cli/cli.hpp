@@ -12,4 +12,8 @@
 #ifndef CLI_HPP
 #define CLI_HPP
 
+#include "passwords/passwords.hpp"
+
+extern void CLI_RunCli(passwords::PasswordManager& manager);
+
 #endif // CLI_HPP
