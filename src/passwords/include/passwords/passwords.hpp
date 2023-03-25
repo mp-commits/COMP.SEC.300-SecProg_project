@@ -42,7 +42,10 @@ typedef struct Login {
 
     bool operator==(const Login& rhs)
     {
-        return guid == rhs.guid;
+        return (url == rhs.url)
+                && (username == rhs.username)
+                && (password == rhs.password)
+                && (guid == rhs.guid);
     }
 
     std::string url;
@@ -58,10 +61,7 @@ public:
 
     bool RemoveLogin(const size_t idx);
 
-    void AddLogin(const Login_t& login) 
-    {
-        m_logins.push_back(login);
-    }
+    bool AddLogin(const Login_t& login);
 
     size_t Count() const
     {
@@ -89,6 +89,7 @@ public:
     }
 
 private:
+    bool Exists(const Login_t& login);
     std::vector<Login_t> m_logins;
 };
 

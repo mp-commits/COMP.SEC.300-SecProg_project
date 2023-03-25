@@ -23,3 +23,25 @@ bool PasswordManager::RemoveLogin(const size_t idx)
 
     return false;
 }
+
+bool PasswordManager::AddLogin(const Login_t& login)
+{
+    if (!Exists(login))
+    {
+        m_logins.push_back(login);
+        return true;
+    }
+    return false;
+}
+
+bool PasswordManager::Exists(const Login_t& login)
+{
+    for (auto l: m_logins)
+    {
+        if (l == login)
+        {
+            return true;
+        }
+    }
+    return false;
+}

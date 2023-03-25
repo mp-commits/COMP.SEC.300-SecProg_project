@@ -25,16 +25,56 @@ using namespace fileops;
 using namespace passwords;
 using namespace std;
 
+#define FILE_PROMPT "Entern input filename (empty for default): "
 #define PASSWORD_PROMPT "Enter file password: "
 #define DEFAULT_FILE_NAME "manager_container.crypt"
 
+static void RunAddLogins(const vector<Login_t>& logins, PasswordManager& manager)
+{
+    size_t ok = 0, fail = 0;
+    for (auto l: logins)
+    {
+        if (manager.AddLogin(l))
+        {
+            ok++;
+        }
+        else
+        {
+            fail++;
+        }
+    }
+
+    cout << "Parsed " << logins.size() << " logins, " << ok << " added, " << fail << " duplicates." << endl;
+}
+
 void OPERATIONS_RunLoadPasswords(passwords::PasswordManager& manager, OperationArgs_t args)
 {
-    cout << PASSWORD_PROMPT;
-    string input;
-    getline(cin, input);
+    string password;
+    string filename = DEFAULT_FILE_NAME;
 
-    ByteVector_t keySha = CalculateSHA256(StringToVector(input));
+    if (args.size() == 2)
+    {
+        password = args[1];
+    }
+    else if (args.size() == 3)
+    {
+        filename = args[1];
+        password = args[2];
+    }
+    else
+    {
+        string newFile;
+        cout << FILE_PROMPT;
+        getline(cin, newFile);
+        if (!newFile.empty())
+        {
+            filename = newFile;
+        }
+        cout << PASSWORD_PROMPT;
+        getline(cin, password);
+    }
+
+    ByteVector_t keySha = CalculateSHA256(StringToVector(password));
     AESGCM_Key256_t key;
     
     if (keySha.size() == key.size())
@@ -49,27 +89,23 @@ void OPERATIONS_RunLoadPasswords(passwords::PasswordManager& manager, OperationA
         return;
     }
 
-    string fileName = DEFAULT_FILE_NAME;
-    if (args.size() > 1)
-    {
-        fileName = args[1];
-    }
-
-    std::ifstream inputFile(fileName, std::ios_base::in);
+    std::ifstream inputFile(filename, std::ios_base::in);
 
     if (inputFile.good())
     {
         string errStr;
-        std::cout << "Loading from '" << fileName << "'" << std::endl;
+        std::cout << "Loading from '" << filename << "'" << std::endl;
         CryptFile crypt(key);
-        if(!crypt.Load(inputFile, manager, errStr))
+        std::vector<passwords::Login_t> logins;
+        if(!crypt.Load(inputFile, logins, errStr))
         {
             std::cout << errStr << std::endl;
         }
         inputFile.close();
+        RunAddLogins(logins, manager);
     }
     else
     {
-        std::cout << "Failed to open '" << fileName << "': " << std::strerror(errno) << std::endl;
+        std::cout << "Failed to open '" << filename << "': " << std::strerror(errno) << std::endl;
     }
 }

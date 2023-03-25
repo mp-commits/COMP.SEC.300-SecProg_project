@@ -62,7 +62,7 @@ void OPERATIONS_RunSavePasswords(passwords::PasswordManager& manager, OperationA
         string errStr;
         std::cout << "Saving to '" << fileName << "'" << std::endl;
         CryptFile crypt(key);
-        crypt.Save(outputFile, manager, errStr);
+        crypt.Save(outputFile, manager.GetLoginVector(), errStr);
         outputFile.close();
     }
     else
