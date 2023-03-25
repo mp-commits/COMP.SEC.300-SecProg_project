@@ -11,29 +11,60 @@
 
 #include "operations/operations.hpp"
 #include "cryptfile/cryptfile.hpp"
+#include "encryption/util.hpp"
+#include "encryption/sha256.hpp"
 
 #include <fstream>
 #include <iostream>
+#include <cstring>
+#include <cerrno>
 
 using namespace encryption;
+using namespace encryptionUtil;
 using namespace fileops;
 using namespace passwords;
+using namespace std;
+
+#define PASSWORD_PROMPT "Enter file password: "
+#define DEFAULT_FILE_NAME "manager_container.crypt"
 
 void OPERATIONS_RunSavePasswords(passwords::PasswordManager& manager, OperationArgs_t args)
 {
-    const std::string FILENAME = "crypt.cont";
-    const AESGCM_Key256_t TEST_KEY = {0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0x10};
+    cout << PASSWORD_PROMPT;
+    string input;
+    getline(cin, input);
 
-    std::fstream inputFile(FILENAME, std::ios_base::binary | std::ios_base::trunc);
-
-    if (inputFile.good())
+    ByteVector_t keySha = CalculateSHA256(StringToVector(input));
+    AESGCM_Key256_t key;
+    
+    if (keySha.size() == key.size())
     {
-        std::cout << "Saving to '" << FILENAME << "'" << std::endl;
-        CryptFile crypt(TEST_KEY, inputFile);
-        crypt.Save(manager);
+        for (size_t i = 0; i < key.size(); i++)
+        {
+            key[i] = keySha[i];
+        }
     }
     else
     {
-        std::cout << "Failed to save to '" << FILENAME << "'" << std::endl;
+        return;
+    }
+
+    string fileName = DEFAULT_FILE_NAME;
+    if (args.size() > 1)
+    {
+        fileName = args[1];
+    }
+
+    std::ofstream outputFile(fileName, std::ios_base::binary | std::ios_base::trunc | std::ios_base::in);
+
+    if (outputFile.good())
+    {
+        std::cout << "Saving to '" << fileName << "'" << std::endl;
+        CryptFile crypt(key);
+        crypt.Save(outputFile, manager);
+    }
+    else
+    {
+        std::cout << "Failed to save to '" << fileName << "': " << std::strerror(errno) << std::endl;
     }
 }

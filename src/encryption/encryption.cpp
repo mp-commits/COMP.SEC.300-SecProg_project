@@ -9,12 +9,16 @@
  * 
  */
 
+#include "encryption/sha256.hpp"
 #include "encryption/encryption.hpp"
 #include "encryption/util.hpp"
 
 #include <openssl/aes.h>
 #include <openssl/evp.h>
 #include <openssl/rand.h>
+#include <openssl/sha.h>
+
+#include <sstream>
 
 using namespace encryption;
 using namespace encryptionUtil;
@@ -159,4 +163,13 @@ std::string AESGCM::decryptString(const std::string& input)
 
     decrypt(data_in, data_out);
     return vectorToString(data_out);
+}
+
+ByteVector_t encryption::CalculateSHA256(const ByteVector_t& data)
+{
+    ByteVector_t hash(SHA256_DIGEST_LENGTH);
+
+    SHA256(data.data(), data.size(), hash.data());
+
+    return hash;
 }

@@ -22,15 +22,14 @@ namespace fileops {
 class CryptFile 
 {
 public:
-    CryptFile(const encryption::AESGCM& aes, std::fstream& file);
+    CryptFile(const encryption::AESGCM& aes);
     ~CryptFile();
 
-    bool Load(passwords::PasswordManager& manager);
-    bool Save(const passwords::PasswordManager& manager);
+    bool Load(std::ifstream& file, passwords::PasswordManager& manager);
+    bool Save(std::ofstream& file, const passwords::PasswordManager& manager);
 
 private:
     encryption::AESGCM m_aes;
-    std::fstream& m_file;
 
     bool VerifyChecksum(ByteVector_t& data);
     void WriteChecksum(ByteVector_t& data);
