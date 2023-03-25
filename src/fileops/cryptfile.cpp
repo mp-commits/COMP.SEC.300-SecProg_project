@@ -46,6 +46,12 @@ static void MakeObject(const std::vector<Login_t>& logins, value& jv)
     jv = value_from(logins, sp);
 }
 
+static void MakeLogins(const value& jv, std::vector<Login_t>& logins)
+{
+    (void)jv;
+    (void)logins;
+}
+
 CryptFile::CryptFile(const encryption::AESGCM& aes) : m_aes(aes)
 {
 
@@ -56,12 +62,41 @@ CryptFile::~CryptFile()
 
 }
 
-bool CryptFile::Load(std::ifstream& file, passwords::PasswordManager& manager)
+bool CryptFile::Load(std::ifstream& file, passwords::PasswordManager& manager, std::string& errorString)
 {
-    return false;
+    file.seekg(std::ios_base::beg);
+    ByteVector_t cryptData;
+    ByteVector_t plainData;
+
+    while(!file.eof())
+    {
+        cryptData.push_back(file.get());
+    }
+
+    std::cout << "Loaded " << cryptData.size() << " bytes" << std::endl;
+
+    if (!m_aes.decrypt(cryptData, plainData))
+    {
+        errorString += "Deryption failed";
+        return false;
+    }
+    //if (!VerifyChecksum(plainData))
+    //{
+    //    errorString += "Checksum failed";
+    //    return false;
+    //}
+    
+    std::string s = vectorToString(cryptData);
+    std::cout << s << std::endl;
+    value jv = parse(s);
+
+    std::cout << jv << std::endl;
+    MakeLogins(jv, manager.GetLoginVector());
+    
+    return true;
 }
 
-bool CryptFile::Save(std::ofstream& file, const passwords::PasswordManager& manager)
+bool CryptFile::Save(std::ofstream& file, const passwords::PasswordManager& manager, std::string& errorString)
 {
     if (manager.Count() != 0)
     {   
@@ -78,10 +113,12 @@ bool CryptFile::Save(std::ofstream& file, const passwords::PasswordManager& mana
         ByteVector_t cryptData;
         ByteVector_t plainData = StringToVector(ss.str());
 
-        WriteChecksum(plainData);
+        //WriteChecksum(plainData);
         m_aes.encrypt(plainData, cryptData);
 
-        for (auto c: cryptData)
+        std::cout << "writing " << plainData.size() << " bytes" << std::endl;
+
+        for (auto c: plainData)
         {
             file.put(c);
         }

@@ -25,8 +25,8 @@ public:
     CryptFile(const encryption::AESGCM& aes);
     ~CryptFile();
 
-    bool Load(std::ifstream& file, passwords::PasswordManager& manager);
-    bool Save(std::ofstream& file, const passwords::PasswordManager& manager);
+    bool Load(std::ifstream& file, passwords::PasswordManager& manager, std::string& errorString);
+    bool Save(std::ofstream& file, const passwords::PasswordManager& manager, std::string& errorString);
 
 private:
     encryption::AESGCM m_aes;

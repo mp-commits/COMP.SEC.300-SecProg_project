@@ -115,6 +115,10 @@ void CLI_RunCli(passwords::PasswordManager& manager)
         {
             OPERATIONS_RunViewPasswords(manager, args);
         }
+        else if (MatchCommand(command, COMMAND_LOAD))
+        {
+            OPERATIONS_RunLoadPasswords(manager, args);
+        }
         else if (MatchCommand(command, COMMAND_HELP))
         {
             DisplayHelp();

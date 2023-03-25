@@ -83,6 +83,11 @@ public:
         return m_logins;
     }
 
+    std::vector<Login_t>& GetLoginVector()
+    {
+        return m_logins;
+    }
+
 private:
     std::vector<Login_t> m_logins;
 };

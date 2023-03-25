@@ -55,13 +55,15 @@ void OPERATIONS_RunSavePasswords(passwords::PasswordManager& manager, OperationA
         fileName = args[1];
     }
 
-    std::ofstream outputFile(fileName, std::ios_base::binary | std::ios_base::trunc | std::ios_base::in);
+    std::ofstream outputFile(fileName, std::ios_base::trunc | std::ios_base::out);
 
     if (outputFile.good())
     {
+        string errStr;
         std::cout << "Saving to '" << fileName << "'" << std::endl;
         CryptFile crypt(key);
-        crypt.Save(outputFile, manager);
+        crypt.Save(outputFile, manager, errStr);
+        outputFile.close();
     }
     else
     {
