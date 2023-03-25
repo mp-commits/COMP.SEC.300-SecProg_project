@@ -13,7 +13,8 @@
 #define CLI_HPP
 
 #include "passwords/passwords.hpp"
+#include "stringvector.hpp"
 
-extern void CLI_RunCli(passwords::PasswordManager& manager);
+extern void CLI_RunCli(passwords::PasswordManager& manager, StringVector_t args = {});
 
 #endif // CLI_HPP

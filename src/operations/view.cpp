@@ -30,7 +30,7 @@ static void PrintLogin(const Login& login)
     cout << endl;
 }
 
-void OPERATIONS_RunViewPasswords(passwords::PasswordManager& manager, OperationArgs_t args)
+void OPERATIONS_RunViewPasswords(passwords::PasswordManager& manager, StringVector_t args)
 {
     Login header("URL", "USERNAME", "PASSWORD");
     PrintLogin(header);

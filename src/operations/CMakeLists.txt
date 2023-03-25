@@ -12,6 +12,7 @@ add_library(${PROJECT_NAME}-static
 target_include_directories(${PROJECT_NAME}-static 
     PUBLIC 
         include
+        ${COMMON_INCLUDE_DIR}
 )
 
 target_link_libraries(${PROJECT_NAME}-static

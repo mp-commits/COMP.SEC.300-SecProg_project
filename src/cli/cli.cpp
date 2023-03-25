@@ -53,11 +53,11 @@ static void DisplayHelp()
     cout << COMMAND_VIEW << endl;
 }
 
-static OperationArgs_t GetArgs(string s, string delimiter)
+static StringVector_t GetArgs(string s, string delimiter)
 {
     size_t start = 0, end, delimLength = delimiter.length();
     string token;
-    OperationArgs_t res;
+    StringVector_t res;
 
     while ((end = s.find(delimiter, start)) != string::npos)
     {
@@ -75,17 +75,61 @@ static void PrintError(string msg)
     cout << msg << endl;
 }
 
-void CLI_RunCli(passwords::PasswordManager& manager)
+static bool TryRunCommand(PasswordManager& manager, string command, StringVector_t& args, bool& exit)
+{
+    if (MatchCommand(command, COMMAND_EXIT))
+    {
+        OPERATIONS_RunSavePasswords(manager);
+        exit = true;
+    }
+    else if (MatchCommand(command, COMMAND_SAVE))
+    {
+        OPERATIONS_RunSavePasswords(manager);
+    }
+    else if (MatchCommand(command, COMMAND_ADD))
+    {
+        OPERATIONS_RunAddPassword(manager);
+    }
+    else if (MatchCommand(command, COMMAND_FIND))
+    {
+        OPERATIONS_RunFindPassword(manager, args);
+    }
+    else if (MatchCommand(command, COMMAND_VIEW))
+    {
+        OPERATIONS_RunViewPasswords(manager, args);
+    }
+    else if (MatchCommand(command, COMMAND_LOAD))
+    {
+        OPERATIONS_RunLoadPasswords(manager, args);
+    }
+    else if (MatchCommand(command, COMMAND_HELP))
+    {
+        DisplayHelp();
+    }
+    else
+    {
+        return false;
+    }
+    return true;
+}
+
+void CLI_RunCli(passwords::PasswordManager& manager, StringVector_t args)
 {
     bool exit = false;
     string input = "";
     string command = "";
 
+    if (!args.empty())
+    {
+        string command = args[0];
+        TryRunCommand(manager, command, args, exit);
+    }
+
     while (!exit)
     {
         cout << CLI_HEADER;
         getline(cin, input);
-        OperationArgs_t args = GetArgs(input, CLI_ARG_DELIM);
+        StringVector_t args = GetArgs(input, CLI_ARG_DELIM);
         if (args.size() == 0)
         {
             PrintError(CLI_ERROR_MESSAGE(input));
@@ -93,37 +137,8 @@ void CLI_RunCli(passwords::PasswordManager& manager)
         }
 
         string command = args[0];
-
-        if (MatchCommand(command, COMMAND_EXIT))
-        {
-            OPERATIONS_RunSavePasswords(manager);
-            exit = true;
-        }
-        else if (MatchCommand(command, COMMAND_SAVE))
-        {
-            OPERATIONS_RunSavePasswords(manager);
-        }
-        else if (MatchCommand(command, COMMAND_ADD))
-        {
-            OPERATIONS_RunAddPassword(manager);
-        }
-        else if (MatchCommand(command, COMMAND_FIND))
-        {
-            OPERATIONS_RunFindPassword(manager, args);
-        }
-        else if (MatchCommand(command, COMMAND_VIEW))
-        {
-            OPERATIONS_RunViewPasswords(manager, args);
-        }
-        else if (MatchCommand(command, COMMAND_LOAD))
-        {
-            OPERATIONS_RunLoadPasswords(manager, args);
-        }
-        else if (MatchCommand(command, COMMAND_HELP))
-        {
-            DisplayHelp();
-        }
-        else
+        bool success = TryRunCommand(manager, command, args, exit);
+        if (!success)
         {
             PrintError(CLI_ERROR_MESSAGE(input));
         }

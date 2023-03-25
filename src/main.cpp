@@ -13,6 +13,7 @@
 #include <string>
 #include "cli/cli.hpp"
 #include "passwords/passwords.hpp"
+#include "stringvector.hpp"
 
 using std::string;
 using std::cout;
@@ -22,6 +23,12 @@ static PasswordManager f_manager;
 
 int main(int argc, char* argv[])
 {
-    CLI_RunCli(f_manager);
+    StringVector_t args;
+    for (int i = 1; i < argc; i++)
+    {
+        args.push_back(std::string(argv[i]));
+    }
+
+    CLI_RunCli(f_manager, args);
     return 0;
 }
