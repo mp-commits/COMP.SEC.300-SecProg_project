@@ -16,5 +16,7 @@ target_include_directories(${PROJECT_NAME}-static
 
 target_link_libraries(${PROJECT_NAME}-static
     PUBLIC
+        encryption-static
+        fileops-static
         passwords-static
 )

@@ -18,98 +18,52 @@
 
 namespace passwords {
 
-class Login {
-public:
-    Login() :
-    m_url(""),
-    m_username(""),
-    m_password(""),
-    m_guid(""){}
+typedef struct Login {
+    Login() = default;
 
     Login(std::string url,
           std::string username,
           std::string password,
           std::string guid) :
-    m_url(url),
-    m_username(username),
-    m_password(password),
-    m_guid(guid){}
+    url(url),
+    username(username),
+    password(password),
+    guid(guid){}
 
     Login(std::string url,
         std::string username,
         std::string password) :
-    m_url(url),
-    m_username(username),
-    m_password(password),
-    m_guid(""){}
+    url(url),
+    username(username),
+    password(password),
+    guid(""){}
 
     ~Login() {}
 
-    std::string GetUrl() const
-    {
-        return m_url;
-    }
-
-    std::string GetUsername() const
-    {
-        return m_username;
-    }
-
-    std::string GetPassword() const
-    {
-        return m_password;
-    }
-
-    std::string GetGuid() const
-    {
-        return m_guid;
-    }
-
-    void SetUrl(const std::string& val) noexcept 
-    {
-        m_url = val;
-    }
-
-    void SetUsername(const std::string& val) noexcept 
-    {
-        m_username = val;
-    }
-
-    void SetPassword(const std::string& val) noexcept 
-    {
-        m_password = val;
-    }
-
-    void SetGuid(const std::string& val) noexcept 
-    {
-        m_guid = val;
-    }
-
     bool operator==(const Login& rhs)
     {
-        return m_guid == rhs.m_guid;
+        return guid == rhs.guid;
     }
 
-private:
-    std::string m_url;
-    std::string m_username;
-    std::string m_password;
-    std::string m_guid;
-};
+    std::string url;
+    std::string username;
+    std::string password;
+    std::string guid;
+} Login_t;
 
 class PasswordManager {
 public:
     PasswordManager() : m_logins({}) {} 
     ~PasswordManager() {}
 
-    void RemoveLogin(const std::string& guid);
+    bool RemoveLogin(const size_t idx);
 
-    void AddLogin(const Login& login) 
+    void AddLogin(const Login_t& login) 
     {
         m_logins.push_back(login);
     }
 
-    size_t Count() 
+    size_t Count() const
     {
         return m_logins.size();
     }
@@ -124,8 +78,13 @@ public:
         return m_logins[index];
     }
 
+    const std::vector<Login_t>& GetLoginVector() const
+    {
+        return m_logins;
+    }
+
 private:
-    std::vector<Login> m_logins;
+    std::vector<Login_t> m_logins;
 };
 
 } // namespace passwords

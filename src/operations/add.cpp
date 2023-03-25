@@ -49,6 +49,6 @@ void OPERATIONS_RunAddPassword(passwords::PasswordManager& manager, OperationArg
         return;
     }
 
-    Login login(domain, name, password);
+    Login_t login(domain, name, password);
     manager.AddLogin(login);
 }

@@ -24,9 +24,9 @@ using namespace std;
 
 static void PrintLogin(const Login& login)
 {
-    cout << login.GetUrl() << setw(DOMAIN_WIDTH) << " ";
-    cout << login.GetUsername() << setw(USER_WIDTH) << " ";
-    cout << login.GetPassword() << setw(PASSWORD_WIDTH) << " ";
+    cout << login.url << setw(DOMAIN_WIDTH) << " ";
+    cout << login.username << setw(USER_WIDTH) << " ";
+    cout << login.password << setw(PASSWORD_WIDTH) << " ";
     cout << endl;
 }
 

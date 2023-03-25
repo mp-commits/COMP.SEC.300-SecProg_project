@@ -13,14 +13,13 @@
 
 using namespace passwords;
 
-void PasswordManager::RemoveLogin(const std::string& guid)
+bool PasswordManager::RemoveLogin(const size_t idx)
 {
-    for (size_t i = 0; i < m_logins.size(); i++)
+    if (idx < m_logins.size())
     {
-        if (m_logins[i].GetGuid() == guid)
-        {
-            m_logins.erase(m_logins.begin() + i);
-            break;
-        }
+        m_logins.erase(m_logins.begin() + idx);
+        return true;
     }
+
+    return false;
 }
