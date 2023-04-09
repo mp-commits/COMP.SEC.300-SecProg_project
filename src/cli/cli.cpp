@@ -23,22 +23,25 @@ using namespace std;
 
 #define COMMAND_ADD  "add"
 #define COMMAND_EXIT "exit"
+// #define COMMAND_EXPORT "export"
 #define COMMAND_FIND "find"
 #define COMMAND_HELP "help"
+// #define COMMAND_IMPORT "import"
 #define COMMAND_LOAD "load"
 #define COMMAND_SAVE "save"
 #define COMMAND_VIEW "view"
 
-static bool MatchCommand(const string& input, const string command)
+static bool MatchCommand(const string& input, const string command, size_t matchIndex = 0)
 {
-    if (input.size() == 1U)
+    bool exactMatch = input == command;
+    bool letterMatch = false;
+
+    if ((input.size() == 1U) && (command.size() > matchIndex))
     {
-        return input[0] == command[0];
+        letterMatch = input[0] == command[matchIndex];
     }
-    else
-    {
-        return input == command;
-    }
+
+    return exactMatch || letterMatch;
 }
 
 static void DisplayHelp()
@@ -77,7 +80,7 @@ static void PrintError(string msg)
 
 static bool TryRunCommand(PasswordManager& manager, string command, StringVector_t& args, bool& exit)
 {
-    if (MatchCommand(command, COMMAND_EXIT))
+    if (MatchCommand(command, COMMAND_EXIT, 1))
     {
         OPERATIONS_RunSavePasswords(manager);
         exit = true;

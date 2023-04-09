@@ -1,4 +1,4 @@
-project(manager_operations)
+project(manager_services)
 
 add_library(${PROJECT_NAME}-static 
     STATIC 
