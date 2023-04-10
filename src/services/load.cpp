@@ -47,7 +47,7 @@ static void RunAddLogins(const vector<Login_t>& logins, PasswordManager& manager
     cout << "Parsed " << logins.size() << " logins, " << ok << " added, " << fail << " duplicates." << endl;
 }
 
-void OPERATIONS_RunLoadPasswords(passwords::PasswordManager& manager, StringVector_t args)
+void SERVICES_RunLoadPasswords(passwords::PasswordManager& manager, StringVector_t args)
 {
     string password;
     string filename = DEFAULT_FILE_NAME;

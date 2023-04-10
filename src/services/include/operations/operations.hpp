@@ -9,16 +9,16 @@
  * 
  */
 
-#ifndef OPERATIONS_HPP
-#define OPERATIONS_HPP
+#ifndef SERVICES_HPP
+#define SERVICES_HPP
 
 #include "passwords/passwords.hpp"
 #include "stringvector.hpp"
 
-extern void OPERATIONS_RunLoadPasswords(passwords::PasswordManager& manager, StringVector_t args = {});
-extern void OPERATIONS_RunSavePasswords(passwords::PasswordManager& manager, StringVector_t args = {});
-extern void OPERATIONS_RunAddPassword(passwords::PasswordManager& manager, StringVector_t args = {});
-extern void OPERATIONS_RunFindPassword(passwords::PasswordManager& manager, StringVector_t args = {});
-extern void OPERATIONS_RunViewPasswords(passwords::PasswordManager& manager, StringVector_t args = {});
+extern void SERVICES_RunLoadPasswords(passwords::PasswordManager& manager, StringVector_t args = {});
+extern void SERVICES_RunSavePasswords(passwords::PasswordManager& manager, StringVector_t args = {});
+extern void SERVICES_RunAddPassword(passwords::PasswordManager& manager, StringVector_t args = {});
+extern void SERVICES_RunFindPassword(passwords::PasswordManager& manager, StringVector_t args = {});
+extern void SERVICES_RunViewPasswords(passwords::PasswordManager& manager, StringVector_t args = {});
 
 #endif

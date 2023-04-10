@@ -11,7 +11,7 @@
 
 #include "operations/operations.hpp"
 
-void OPERATIONS_RunFindPassword(passwords::PasswordManager& manager, StringVector_t args)
+void SERVICES_RunFindPassword(passwords::PasswordManager& manager, StringVector_t args)
 {
     (void)manager;
 }

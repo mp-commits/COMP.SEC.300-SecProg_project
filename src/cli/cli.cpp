@@ -82,28 +82,28 @@ static bool TryRunCommand(PasswordManager& manager, string command, StringVector
 {
     if (MatchCommand(command, COMMAND_EXIT, 1))
     {
-        OPERATIONS_RunSavePasswords(manager);
+        SERVICES_RunSavePasswords(manager);
         exit = true;
     }
     else if (MatchCommand(command, COMMAND_SAVE))
     {
-        OPERATIONS_RunSavePasswords(manager);
+        SERVICES_RunSavePasswords(manager);
     }
     else if (MatchCommand(command, COMMAND_ADD))
     {
-        OPERATIONS_RunAddPassword(manager);
+        SERVICES_RunAddPassword(manager);
     }
     else if (MatchCommand(command, COMMAND_FIND))
     {
-        OPERATIONS_RunFindPassword(manager, args);
+        SERVICES_RunFindPassword(manager, args);
     }
     else if (MatchCommand(command, COMMAND_VIEW))
     {
-        OPERATIONS_RunViewPasswords(manager, args);
+        SERVICES_RunViewPasswords(manager, args);
     }
     else if (MatchCommand(command, COMMAND_LOAD))
     {
-        OPERATIONS_RunLoadPasswords(manager, args);
+        SERVICES_RunLoadPasswords(manager, args);
     }
     else if (MatchCommand(command, COMMAND_HELP))
     {

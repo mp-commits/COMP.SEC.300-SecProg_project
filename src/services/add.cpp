@@ -22,7 +22,7 @@ using namespace std;
 #define ERROR_EMPTY_PASSWORD "Password cannot be empty"
 #define ERROR_EMPTY_ID "Both name and domain cannot be empty"
 
-void OPERATIONS_RunAddPassword(passwords::PasswordManager& manager, StringVector_t args)
+void SERVICES_RunAddPassword(passwords::PasswordManager& manager, StringVector_t args)
 {
     string name = "";
     string domain = "";

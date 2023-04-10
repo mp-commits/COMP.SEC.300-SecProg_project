@@ -28,7 +28,7 @@ using namespace std;
 #define PASSWORD_PROMPT "Enter file password: "
 #define DEFAULT_FILE_NAME "manager_container.crypt"
 
-void OPERATIONS_RunSavePasswords(passwords::PasswordManager& manager, StringVector_t args)
+void SERVICES_RunSavePasswords(passwords::PasswordManager& manager, StringVector_t args)
 {
     cout << PASSWORD_PROMPT;
     string input;
