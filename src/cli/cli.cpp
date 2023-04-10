@@ -22,6 +22,7 @@ using namespace std;
 #define CLI_ERROR_MESSAGE(line) ("Invalid input: '" + line + "'")
 
 #define COMMAND_ADD     "add"
+#define COMMAND_COPY    "copy"
 #define COMMAND_EXIT    "exit"
 #define COMMAND_EXPORT  "export"
 #define COMMAND_FIND    "find"
@@ -112,6 +113,10 @@ static bool TryRunCommand(PasswordManager& manager, string command, StringVector
     else if (MatchCommand(command, COMMAND_IMPORT))
     {
         SERVICES_RunImportPasswords(manager, args);
+    }
+    else if (MatchCommand(command, COMMAND_COPY))
+    {
+        SERVICES_RunCopyPassword(manager, args);
     }
     else if (MatchCommand(command, COMMAND_HELP))
     {

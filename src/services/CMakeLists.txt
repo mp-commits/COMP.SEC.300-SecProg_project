@@ -2,7 +2,8 @@ project(manager_services)
 
 add_library(${PROJECT_NAME}-static 
     STATIC 
-        add.cpp 
+        add.cpp
+        copy.cpp
         load.cpp
         port.cpp
         save.cpp
@@ -18,6 +19,7 @@ target_include_directories(${PROJECT_NAME}-static
 target_link_libraries(${PROJECT_NAME}-static
     PUBLIC
         Boost::tokenizer
+        decap::clip
         encryption-static
         fileops-static
         passwords-static
