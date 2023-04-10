@@ -25,16 +25,39 @@ using namespace fileops;
 using namespace passwords;
 using namespace std;
 
+#define FILE_PROMPT "Enter file name (empty for default): "
 #define PASSWORD_PROMPT "Enter file password: "
 #define DEFAULT_FILE_NAME "manager_container.crypt"
 
 void SERVICES_RunSavePasswords(passwords::PasswordManager& manager, StringVector_t args)
 {
-    cout << PASSWORD_PROMPT;
-    string input;
-    getline(cin, input);
+    string filename = DEFAULT_FILE_NAME;
+    string password;
 
-    ByteVector_t keySha = CalculateSHA256(StringToVector(input));
+    if (args.size() == 2U)
+    {
+        password = args[1];
+    }
+    else if (args.size() == 3U)
+    {
+        filename = args[1];
+        password = args[2];
+    }
+    else
+    {
+        cout << FILE_PROMPT;
+        getline(cin, filename);
+        
+        if (filename.empty())
+        {
+            filename = DEFAULT_FILE_NAME;
+        }
+
+        cout << PASSWORD_PROMPT;
+        getline(cin, password);
+    }
+
+    ByteVector_t keySha = CalculateSHA256(StringToVector(password));
     AESGCM_Key256_t key;
     
     if (keySha.size() == key.size())
@@ -49,24 +72,18 @@ void SERVICES_RunSavePasswords(passwords::PasswordManager& manager, StringVector
         return;
     }
 
-    string fileName = DEFAULT_FILE_NAME;
-    if (args.size() > 1)
-    {
-        fileName = args[1];
-    }
-
-    std::ofstream outputFile(fileName, std::ios_base::trunc | std::ios_base::out);
+    std::ofstream outputFile(filename, std::ios_base::trunc | std::ios_base::out);
 
     if (outputFile.good())
     {
         string errStr;
-        std::cout << "Saving to '" << fileName << "'" << std::endl;
+        std::cout << "Saving to '" << filename << "'" << std::endl;
         CryptFile crypt(key);
         crypt.Save(outputFile, manager.GetLoginVector(), errStr);
         outputFile.close();
     }
     else
     {
-        std::cout << "Failed to save to '" << fileName << "': " << std::strerror(errno) << std::endl;
+        std::cout << "Failed to save to '" << filename << "': " << std::strerror(errno) << std::endl;
     }
 }
