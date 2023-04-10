@@ -21,15 +21,15 @@ using namespace std;
 #define CLI_ARG_DELIM " "
 #define CLI_ERROR_MESSAGE(line) ("Invalid input: '" + line + "'")
 
-#define COMMAND_ADD  "add"
-#define COMMAND_EXIT "exit"
-// #define COMMAND_EXPORT "export"
-#define COMMAND_FIND "find"
-#define COMMAND_HELP "help"
-// #define COMMAND_IMPORT "import"
-#define COMMAND_LOAD "load"
-#define COMMAND_SAVE "save"
-#define COMMAND_VIEW "view"
+#define COMMAND_ADD     "add"
+#define COMMAND_EXIT    "exit"
+#define COMMAND_EXPORT  "export"
+#define COMMAND_FIND    "find"
+#define COMMAND_HELP    "help"
+#define COMMAND_IMPORT  "import"
+#define COMMAND_LOAD    "load"
+#define COMMAND_SAVE    "save"
+#define COMMAND_VIEW    "view"
 
 static bool MatchCommand(const string& input, const string command, size_t matchIndex = 0)
 {
@@ -104,6 +104,14 @@ static bool TryRunCommand(PasswordManager& manager, string command, StringVector
     else if (MatchCommand(command, COMMAND_LOAD))
     {
         SERVICES_RunLoadPasswords(manager, args);
+    }
+    else if (MatchCommand(command, COMMAND_EXPORT))
+    {
+        SERVICES_RunExportPasswords(manager, args);
+    }
+    else if (MatchCommand(command, COMMAND_IMPORT))
+    {
+        SERVICES_RunImportPasswords(manager, args);
     }
     else if (MatchCommand(command, COMMAND_HELP))
     {

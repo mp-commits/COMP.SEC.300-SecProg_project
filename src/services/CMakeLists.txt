@@ -5,6 +5,7 @@ add_library(${PROJECT_NAME}-static
         add.cpp 
         find.cpp
         load.cpp
+        port.cpp
         save.cpp
         view.cpp
 )
@@ -17,6 +18,7 @@ target_include_directories(${PROJECT_NAME}-static
 
 target_link_libraries(${PROJECT_NAME}-static
     PUBLIC
+        Boost::tokenizer
         encryption-static
         fileops-static
         passwords-static
