@@ -41,6 +41,14 @@ static void PrintLogin(const size_t idx, const Login& login)
     cout << endl;
 }
 
+static bool MatchToLogin(const string& key, const Login_t& login)
+{
+    bool urlMatch = login.url.find(key) != string::npos;
+    bool nameMatch = login.username.find(key) != string::npos;
+    
+    return urlMatch || nameMatch;
+}
+
 void SERVICES_RunViewPasswords(passwords::PasswordManager& manager, StringVector_t args)
 {
     const size_t count = manager.Count();
@@ -82,5 +90,24 @@ void SERVICES_RunViewPasswords(passwords::PasswordManager& manager, StringVector
         {
             PrintLogin(i, manager[i]);
         }
+    }
+}
+
+void SERVICES_RunFindPassword(passwords::PasswordManager& manager, StringVector_t args)
+{
+    if (args.size() == 2U)
+    {
+        for (size_t i = 0; i < manager.Count(); i++)
+        {
+            Login_t login = manager[i];
+            if (MatchToLogin(args[1], login))
+            {
+                PrintLogin(i, login);
+            }
+        }
+    }
+    else
+    {
+        cout << "Invalid arguments!" << endl;
     }
 }

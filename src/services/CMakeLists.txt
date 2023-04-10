@@ -3,7 +3,6 @@ project(manager_services)
 add_library(${PROJECT_NAME}-static 
     STATIC 
         add.cpp 
-        find.cpp
         load.cpp
         port.cpp
         save.cpp
