@@ -14,7 +14,6 @@
 #include "encryption/sha256.hpp"
 #include "encryption/util.hpp"
 
-#include <iostream>
 #include <sstream>
 #include <iomanip>
 
@@ -116,7 +115,6 @@ bool CryptFile::Load(std::ifstream& file, std::vector<passwords::Login_t>& login
     std::string s = vectorToString(plainData);
     value jv = parse(s);
 
-    std::cout << jv << std::endl;
     MakeLogins(jv, logins);
     
     return true;
@@ -130,8 +128,6 @@ bool CryptFile::Save(std::ofstream& file, const std::vector<passwords::Login_t>&
         
         value jv;
         MakeObject(logins, jv);
-
-        std::cout << jv << std::endl;
 
         std::stringstream ss;
         ss << jv;

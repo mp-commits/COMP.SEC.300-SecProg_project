@@ -133,12 +133,12 @@ extern void SERVICES_RunImportPasswords(passwords::PasswordManager& manager, Str
         return;
     }
 
-    const string fileName = args[1];
-    ifstream file(fileName, std::ios::in);
+    const string filename = args[1];
+    ifstream file(filename, std::ios::in);
     
     if (!file.good())
     {
-        cout << "File error" << endl;
+        std::cout << "Failed to open '" << filename << "': " << std::strerror(errno) << std::endl;
         return;
     }
 
@@ -154,12 +154,12 @@ extern void SERVICES_RunExportPasswords(passwords::PasswordManager& manager, Str
         return;
     }
 
-    const string fileName = args[1];
-    ofstream file(fileName, std::ios::out | std::ios::trunc);
+    const string filename = args[1];
+    ofstream file(filename, std::ios::out | std::ios::trunc);
     
     if (!file.good())
     {
-        cout << "File error" << endl;
+        std::cout << "Failed to open '" << filename << "': " << std::strerror(errno) << std::endl;
         return;
     }
 
