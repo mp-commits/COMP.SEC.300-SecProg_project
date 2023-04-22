@@ -35,23 +35,33 @@ using namespace std;
 #define COMMAND_SAVE    "save"
 #define COMMAND_VIEW    "view"
 
+static bool MatchCommand(const string& input, const string command, size_t matchIndex);
+static void DisplayHelp(PasswordManager&, StringVector_t args);
+static StringVector_t GetArgs(string s, string delimiter);
+static void PrintError(string msg);
+static bool TryRunCommand(PasswordManager& manager, string command, StringVector_t& args, bool& exit);
+
 typedef struct 
 {
+    size_t letterAccessIdx;
     const string cmd;
     function<void(passwords::PasswordManager&, StringVector_t)> func;
     const string description;
+    const StringVector_t params;
 } CommandDescription_t;
 
 static const CommandDescription_t COMMANDS[] = {
-    {COMMAND_ADD,       SERVICES_RunAddPassword,        "Add a password to the manager"},
-    {COMMAND_COPY,      SERVICES_RunCopyPassword,       "Copy a password to clipboard"},
-    {COMMAND_SAVE,      SERVICES_RunSavePasswords,      "Save passwords to an encrypted file"},
-    {COMMAND_EXPORT,    SERVICES_RunExportPasswords,    "Export passwords to a csv file"},
-    {COMMAND_IMPORT,    SERVICES_RunImportPasswords,    "Import passwords from a csv file"},
-    {COMMAND_LOAD,      SERVICES_RunLoadPasswords,      "Load passwords from an encrypted file"},
-    {COMMAND_REMOVE,    SERVICES_RunRemovePassword,     "Removes password with a specific index"},
-    {COMMAND_VIEW,      SERVICES_RunViewPasswords,      "View existing passwords"},
-    {COMMAND_FIND,      SERVICES_RunFindPassword,       "Find a passwords by string"}
+    {0U, COMMAND_ADD,       SERVICES_RunAddPassword,        "Add a password to the manager",            {""}},
+    {0U, COMMAND_COPY,      SERVICES_RunCopyPassword,       "Copy a password to clipboard",             {"[idx]"}},
+    {0U, COMMAND_SAVE,      SERVICES_RunSavePasswords,      "Save passwords to an encrypted file",      {"", "[password]", "[file] [password]"}},
+    {1U, COMMAND_EXIT,      nullptr,                        "Exit the program",                         {""}},
+    {0U, COMMAND_EXPORT,    SERVICES_RunExportPasswords,    "Export passwords to a csv file",           {"", "[file]"}},
+    {0U, COMMAND_IMPORT,    SERVICES_RunImportPasswords,    "Import passwords from a csv file",         {"", "[file]"}},
+    {0U, COMMAND_LOAD,      SERVICES_RunLoadPasswords,      "Load passwords from an encrypted file",    {"", "[password]", "[file] [password]"}},
+    {0U, COMMAND_REMOVE,    SERVICES_RunRemovePassword,     "Removes password with a specific index",   {"[idx]"}},
+    {0U, COMMAND_VIEW,      SERVICES_RunViewPasswords,      "View existing passwords",                  {"", "[page]", "[idx from] [idx to]"}},
+    {0U, COMMAND_FIND,      SERVICES_RunFindPassword,       "Find a passwords by string",               {"[search key]"}},
+    {0U, COMMAND_HELP,      DisplayHelp,                    "Display help",                             {"", "[cmd]"}}
 };
 
 static bool MatchCommand(const string& input, const string command, size_t matchIndex = 0)
@@ -67,14 +77,30 @@ static bool MatchCommand(const string& input, const string command, size_t match
     return exactMatch || letterMatch;
 }
 
-static void DisplayHelp()
+static void DisplayHelp(PasswordManager&, StringVector_t args)
 {
-    constexpr int CMD_WIDTH = 8;
-    cout << "Commands:" << endl;
-    
+    string cmd = "";
+    if (args.size() > 1)
+    {
+        cmd = args[1];
+    }
+    else
+    {
+        cout << "To view specific command run 'help [comamnd]'" << endl;
+        cout << "Supported commands:" << endl;
+    }
+
     for (auto c: COMMANDS)
     {
-        cout << setw(CMD_WIDTH) << c.cmd << " - " << c.description << endl;
+        if ((cmd == "") || MatchCommand(cmd, c.cmd, c.letterAccessIdx))
+        {
+            cout << c.cmd << ", " << c.cmd[c.letterAccessIdx] << " : " << c.description << ". Usage:" << endl;
+            for (auto param : c.params)
+            {
+                cout << "    " << c.cmd << " " << param << endl;
+            }
+            cout << endl;
+        }
     }
 }
 
@@ -113,17 +139,13 @@ static bool TryRunCommand(PasswordManager& manager, string command, StringVector
         }
         exit = true;
     }
-    else if (MatchCommand(command, COMMAND_HELP))
-    {
-        DisplayHelp();
-    }
     else
     {
         success = false;
 
         for (auto c: COMMANDS)
         {
-            if (MatchCommand(command, c.cmd))
+            if (MatchCommand(command, c.cmd, c.letterAccessIdx))
             {
                 c.func(manager, args);
 

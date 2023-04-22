@@ -53,7 +53,11 @@ void SERVICES_RunViewPasswords(passwords::PasswordManager& manager, StringVector
 {
     const size_t count = manager.Count();
 
-    if (args.size() > 1U)
+    if (count == 0)
+    {
+        cout << "No login information loaded" << endl;
+    }
+    else if (args.size() > 1U)
     {
         try {
             size_t startIdx = 0;
@@ -77,6 +81,10 @@ void SERVICES_RunViewPasswords(passwords::PasswordManager& manager, StringVector
                 {
                     PrintLogin(i, manager[i]);
                 }
+            }
+            else
+            {
+                cout << "Invalid index!";
             }
         }
         catch (...)
