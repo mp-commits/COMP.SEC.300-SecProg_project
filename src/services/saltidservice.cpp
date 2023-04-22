@@ -13,14 +13,6 @@
 #include "project_definitions.hpp"
 #include <algorithm>
 
-constexpr uint8_t APPLICATION_HEADER[PROJECT_ID_HEADER_SIZE] = 
-{
-    0x5d, 0x6a, 0x13, 0x0e, 0x7a, 0xd2, 0x71, 0xf7, 
-    0x45, 0x18, 0x1f, 0xb9, 0x82, 0x96, 0x18, 0x67, 
-    0x28, 0x4d, 0x57, 0x72, 0x43, 0xa7, 0x84, 0x9d, 
-    0x1b, 0x7c, 0x8b, 0x87, 0x9d, 0x95, 0xc9, 0x22
-};
-
 static std::vector<ByteVector_t> f_storage;
 
 void IDSERVICE_AddId(const ByteVector_t& id)
@@ -43,10 +35,9 @@ bool IDSERVICE_IsRegistered(const ByteVector_t& id)
     return false;
 }
 
-const ByteVector_t& IDSERVICE_GetApplicationHeader()
+const ByteVector_t IDSERVICE_GetApplicationHeader()
 {
-    static const ByteVector_t vec(APPLICATION_HEADER, APPLICATION_HEADER + PROJECT_ID_HEADER_SIZE);
-    return vec;
+    return PROJECT_FILE_ID_HEADER;
 }
 
 bool IDSERVICE_IsApplicationHeader(const ByteVector_t& id)

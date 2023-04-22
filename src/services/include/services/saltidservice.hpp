@@ -18,7 +18,7 @@ extern void IDSERVICE_AddId(const ByteVector_t& id);
 
 extern bool IDSERVICE_IsRegistered(const ByteVector_t& id);
 
-extern const ByteVector_t& IDSERVICE_GetApplicationHeader();
+extern const ByteVector_t IDSERVICE_GetApplicationHeader();
 
 extern bool IDSERVICE_IsApplicationHeader(const ByteVector_t& id);
 
