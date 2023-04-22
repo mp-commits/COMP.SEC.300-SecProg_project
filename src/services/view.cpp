@@ -56,8 +56,8 @@ void SERVICES_RunViewPasswords(passwords::PasswordManager& manager, StringVector
     if (args.size() > 1U)
     {
         try {
-            size_t startIdx;
-            size_t endIdx;
+            size_t startIdx = 0;
+            size_t endIdx = 0;
 
             if (args.size() == 2U)
             {
