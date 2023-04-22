@@ -23,5 +23,6 @@ extern void SERVICES_RunViewPasswords(passwords::PasswordManager& manager, Strin
 extern void SERVICES_RunImportPasswords(passwords::PasswordManager& manager, StringVector_t args = {});
 extern void SERVICES_RunExportPasswords(passwords::PasswordManager& manager, StringVector_t args = {});
 extern void SERVICES_RunCopyPassword(passwords::PasswordManager& manager, StringVector_t args = {});
+extern void SERVICES_RunRemovePassword(passwords::PasswordManager& manager, StringVector_t args = {});
 
 #endif

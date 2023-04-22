@@ -31,6 +31,7 @@ using namespace std;
 #define COMMAND_HELP    "help"
 #define COMMAND_IMPORT  "import"
 #define COMMAND_LOAD    "load"
+#define COMMAND_REMOVE  "remove"
 #define COMMAND_SAVE    "save"
 #define COMMAND_VIEW    "view"
 
@@ -48,6 +49,7 @@ static const CommandDescription_t COMMANDS[] = {
     {COMMAND_EXPORT,    SERVICES_RunExportPasswords,    "Export passwords to a csv file"},
     {COMMAND_IMPORT,    SERVICES_RunImportPasswords,    "Import passwords from a csv file"},
     {COMMAND_LOAD,      SERVICES_RunLoadPasswords,      "Load passwords from an encrypted file"},
+    {COMMAND_REMOVE,    SERVICES_RunRemovePassword,     "Removes password with a specific index"},
     {COMMAND_VIEW,      SERVICES_RunViewPasswords,      "View existing passwords"},
     {COMMAND_FIND,      SERVICES_RunFindPassword,       "Find a passwords by string"}
 };

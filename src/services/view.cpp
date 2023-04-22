@@ -111,3 +111,36 @@ void SERVICES_RunFindPassword(passwords::PasswordManager& manager, StringVector_
         cout << "Invalid arguments!" << endl;
     }
 }
+
+void SERVICES_RunRemovePassword(passwords::PasswordManager& manager, StringVector_t args)
+{
+    const size_t count = manager.Count();
+
+    try {
+        if (args.size() == 2U)
+        {
+            const size_t idx = stoi(args[1]);
+            
+            if (idx < count)
+            {
+                if (manager.RemoveLogin(idx))
+                {
+                    manager.SetDataSaved(false);
+                    cout << "Removed login number " << idx << endl;
+                }
+            }
+            else
+            {
+                throw std::invalid_argument("Index too high!");
+            }
+        }
+        else
+        {
+            throw std::invalid_argument("Wrong number of arguments!");
+        }
+    }
+    catch (...)
+    {
+        cout << "Invalid arguments" << endl;
+    }
+}
