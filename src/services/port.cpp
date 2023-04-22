@@ -81,11 +81,27 @@ static bool KeyExists(const KeyMap_t& map, string key)
     return false;
 }
 
+static bool FileExists(const std::string& filename)
+{
+    bool exists = false;
+    ifstream file(filename);
+
+    if (file)
+    {
+        exists = true;
+    }
+
+    file.close();
+    return exists;
+}
+
 static void ImportFromFile(ifstream& file, passwords::PasswordManager& manager)
 {
     string line;
     KeyMap_t keys;
     bool firstLine = true;
+
+    size_t processed = 0, accepted = 0, failed = 0;
 
     while (getline(file, line))
     {
@@ -115,7 +131,8 @@ static void ImportFromFile(ifstream& file, passwords::PasswordManager& manager)
                 login.url = tokens[idxUrl];
                 login.password = tokens[idxPassword];
 
-                manager.AddLogin(login);
+                processed++;
+                manager.AddLogin(login) ? accepted++ : failed++;
             }
             else
             {
@@ -123,17 +140,40 @@ static void ImportFromFile(ifstream& file, passwords::PasswordManager& manager)
             }
         }
     }
+
+    cout << "Parsed " << processed << " logins, " << accepted << " imported, " << failed << " duplicates." << endl;
+}
+
+static void ExportToFile(ofstream& file, passwords::PasswordManager& manager)
+{
+    file << OUTPUT_HEADER << endl;
+
+    for (size_t i = 0; i < manager.Count(); i++)
+    {
+        Login_t login = manager[i];
+
+        Escape(login.url);
+        Escape(login.username);
+        Escape(login.password);
+
+        file << login.url << OUTPUT_SEPARATOR << login.username << OUTPUT_SEPARATOR << login.password << endl;
+    }
 }
 
 extern void SERVICES_RunImportPasswords(passwords::PasswordManager& manager, StringVector_t args)
 {
+    string filename;
+
     if (args.size() < 2)
     {
-        cout << "invalid args" << endl;
-        return;
+        cout << "Enter import file: ";
+        getline(cin, filename);
+    }
+    else
+    {
+        filename = args[1];
     }
 
-    const string filename = args[1];
     ifstream file(filename, std::ios::in);
     
     if (!file.good())
@@ -148,33 +188,36 @@ extern void SERVICES_RunImportPasswords(passwords::PasswordManager& manager, Str
 
 extern void SERVICES_RunExportPasswords(passwords::PasswordManager& manager, StringVector_t args)
 {
+    string filename;
+
     if (args.size() < 2)
     {
-        cout << "invalid args" << endl;
-        return;
+        cout << "Enter export file: ";
+        getline(cin, filename);
+    }
+    else
+    {
+        filename = args[1];
     }
 
-    const string filename = args[1];
+    if (FileExists(filename))
+    {
+        std::cout << "File already exits '" << filename << "'" << std::endl;
+        return;
+    }
+    
     ofstream file(filename, std::ios::out | std::ios::trunc);
     
     if (!file.good())
     {
         std::cout << "Failed to open '" << filename << "': " << std::strerror(errno) << std::endl;
+        file.close();
         return;
     }
 
-    file << OUTPUT_HEADER << endl;
+    cout << "Exporting to '" << filename << "'" << std::endl;
 
-    for (size_t i = 0; i < manager.Count(); i++)
-    {
-        Login_t login = manager[i];
-
-        Escape(login.url);
-        Escape(login.username);
-        Escape(login.password);
-
-        file << login.url << OUTPUT_SEPARATOR << login.username << OUTPUT_SEPARATOR << login.password << endl;
-    }
+    ExportToFile(file, manager);
 
     file.close();
 }

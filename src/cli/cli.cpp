@@ -12,7 +12,9 @@
 #include "cli/cli.hpp"
 #include "operations/operations.hpp"
 #include <iostream>
+#include <iomanip>
 #include <string>
+#include <functional>
 
 using namespace passwords;
 using namespace std;
@@ -32,6 +34,24 @@ using namespace std;
 #define COMMAND_SAVE    "save"
 #define COMMAND_VIEW    "view"
 
+typedef struct 
+{
+    const string cmd;
+    function<void(passwords::PasswordManager&, StringVector_t)> func;
+    const string description;
+} CommandDescription_t;
+
+static const CommandDescription_t COMMANDS[] = {
+    {COMMAND_ADD,       SERVICES_RunAddPassword,        "Add a password to the manager"},
+    {COMMAND_COPY,      SERVICES_RunCopyPassword,       "Copy a password to clipboard"},
+    {COMMAND_SAVE,      SERVICES_RunSavePasswords,      "Save passwords to an encrypted file"},
+    {COMMAND_EXPORT,    SERVICES_RunExportPasswords,    "Export passwords to a csv file"},
+    {COMMAND_IMPORT,    SERVICES_RunImportPasswords,    "Import passwords from a csv file"},
+    {COMMAND_LOAD,      SERVICES_RunLoadPasswords,      "Load passwords from an encrypted file"},
+    {COMMAND_VIEW,      SERVICES_RunViewPasswords,      "View existing passwords"},
+    {COMMAND_FIND,      SERVICES_RunFindPassword,       "Find a passwords by string"}
+};
+
 static bool MatchCommand(const string& input, const string command, size_t matchIndex = 0)
 {
     bool exactMatch = input == command;
@@ -47,14 +67,13 @@ static bool MatchCommand(const string& input, const string command, size_t match
 
 static void DisplayHelp()
 {
+    constexpr int CMD_WIDTH = 8;
     cout << "Commands:" << endl;
-    cout << COMMAND_ADD << endl;
-    cout << COMMAND_EXIT << endl;
-    cout << COMMAND_FIND << endl;
-    cout << COMMAND_HELP << endl;
-    cout << COMMAND_LOAD << endl;
-    cout << COMMAND_SAVE << endl;
-    cout << COMMAND_VIEW << endl;
+    
+    for (auto c: COMMANDS)
+    {
+        cout << setw(CMD_WIDTH) << c.cmd << " - " << c.description << endl;
+    }
 }
 
 static StringVector_t GetArgs(string s, string delimiter)
@@ -81,42 +100,12 @@ static void PrintError(string msg)
 
 static bool TryRunCommand(PasswordManager& manager, string command, StringVector_t& args, bool& exit)
 {
+    bool success = true;
+
     if (MatchCommand(command, COMMAND_EXIT, 1))
     {
         SERVICES_RunSavePasswords(manager, args);
         exit = true;
-    }
-    else if (MatchCommand(command, COMMAND_SAVE))
-    {
-        SERVICES_RunSavePasswords(manager, args);
-    }
-    else if (MatchCommand(command, COMMAND_ADD))
-    {
-        SERVICES_RunAddPassword(manager);
-    }
-    else if (MatchCommand(command, COMMAND_FIND))
-    {
-        SERVICES_RunFindPassword(manager, args);
-    }
-    else if (MatchCommand(command, COMMAND_VIEW))
-    {
-        SERVICES_RunViewPasswords(manager, args);
-    }
-    else if (MatchCommand(command, COMMAND_LOAD))
-    {
-        SERVICES_RunLoadPasswords(manager, args);
-    }
-    else if (MatchCommand(command, COMMAND_EXPORT))
-    {
-        SERVICES_RunExportPasswords(manager, args);
-    }
-    else if (MatchCommand(command, COMMAND_IMPORT))
-    {
-        SERVICES_RunImportPasswords(manager, args);
-    }
-    else if (MatchCommand(command, COMMAND_COPY))
-    {
-        SERVICES_RunCopyPassword(manager, args);
     }
     else if (MatchCommand(command, COMMAND_HELP))
     {
@@ -124,9 +113,21 @@ static bool TryRunCommand(PasswordManager& manager, string command, StringVector
     }
     else
     {
-        return false;
+        success = false;
+
+        for (auto c: COMMANDS)
+        {
+            if (MatchCommand(command, c.cmd))
+            {
+                c.func(manager, args);
+
+                success = true;
+                break;
+            }
+        }
     }
-    return true;
+
+    return success;
 }
 
 void CLI_RunCli(passwords::PasswordManager& manager, StringVector_t args)

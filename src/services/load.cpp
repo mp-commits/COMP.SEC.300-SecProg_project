@@ -82,10 +82,12 @@ void SERVICES_RunLoadPasswords(passwords::PasswordManager& manager, StringVector
         std::cout << "Loading from '" << filename << "'" << std::endl;
         CryptFile crypt(password);
         std::vector<passwords::Login_t> logins;
+
         if(!crypt.Load(inputFile, logins, errStr))
         {
             std::cout << errStr << std::endl;
         }
+        
         inputFile.close();
         RunAddLogins(logins, manager);
     }
