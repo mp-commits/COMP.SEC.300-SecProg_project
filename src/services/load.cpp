@@ -9,7 +9,7 @@
  * 
  */
 
-#include "operations/operations.hpp"
+#include "services/managerservices.hpp"
 #include "cryptfile/cryptfile.hpp"
 #include "encryption/util.hpp"
 #include "encryption/sha256.hpp"
@@ -34,14 +34,7 @@ static void RunAddLogins(const vector<Login_t>& logins, PasswordManager& manager
     size_t ok = 0, fail = 0;
     for (auto l: logins)
     {
-        if (manager.AddLogin(l))
-        {
-            ok++;
-        }
-        else
-        {
-            fail++;
-        }
+        manager.AddLogin(l) ? ok++ : fail++;
     }
 
     cout << "Parsed " << logins.size() << " logins, " << ok << " added, " << fail << " duplicates." << endl;
@@ -87,7 +80,7 @@ void SERVICES_RunLoadPasswords(passwords::PasswordManager& manager, StringVector
         {
             std::cout << errStr << std::endl;
         }
-        
+
         inputFile.close();
         RunAddLogins(logins, manager);
     }

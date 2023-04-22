@@ -18,25 +18,20 @@
 
 namespace passwords {
 
+namespace util
+{
+extern bool StringIsValid(const std::string& str);
+}
+
 typedef struct Login {
     Login() = default;
-
-    Login(std::string url,
-          std::string username,
-          std::string password,
-          std::string guid) :
-    url(url),
-    username(username),
-    password(password),
-    guid(guid){}
 
     Login(std::string url,
         std::string username,
         std::string password) :
     url(url),
     username(username),
-    password(password),
-    guid(""){}
+    password(password) {}
 
     ~Login() {}
 
@@ -44,14 +39,12 @@ typedef struct Login {
     {
         return (url == rhs.url)
                 && (username == rhs.username)
-                && (password == rhs.password)
-                && (guid == rhs.guid);
+                && (password == rhs.password);
     }
 
     std::string url;
     std::string username;
     std::string password;
-    std::string guid;
 } Login_t;
 
 class PasswordManager {
@@ -90,6 +83,7 @@ public:
 
 private:
     bool Exists(const Login_t& login);
+    bool LoginIsValid(const Login_t& login);
     std::vector<Login_t> m_logins;
 };
 

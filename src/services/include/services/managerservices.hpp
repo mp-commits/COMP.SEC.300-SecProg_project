@@ -1,5 +1,5 @@
 /**
- * @file operations.hpp
+ * @file managerservices.hpp
  * @author your name (you@domain.com)
  * @brief 
  * @version 0.1
@@ -9,8 +9,8 @@
  * 
  */
 
-#ifndef SERVICES_HPP
-#define SERVICES_HPP
+#ifndef MANAGER_SERVICES_HPP
+#define MANAGER_SERVICES_HPP
 
 #include "passwords/passwords.hpp"
 #include "stringvector.hpp"

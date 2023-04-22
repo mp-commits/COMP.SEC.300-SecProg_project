@@ -34,8 +34,7 @@ void tag_invoke(const value_from_tag&, value& jv, Login_t const& l )
     jv = {
         { "url", l.url },
         { "username", l.username },
-        { "password", l.password },
-        { "guid", l.guid }
+        { "password", l.password }
     };
 }
 
@@ -59,9 +58,8 @@ Login_t tag_invoke(const value_to_tag<Login_t>&, const value& jv)
     std::string username = AttemptToGetString(jv, "username");
     std::string url = AttemptToGetString(jv, "url");
     std::string password = AttemptToGetString(jv, "password");
-    std::string guid = AttemptToGetString(jv, "guid");
 
-    return Login_t(url, username, password, guid);
+    return Login_t(url, username, password);
 }
 
 } // namespace passwords
@@ -120,7 +118,7 @@ bool CryptFile::Load(std::ifstream& file, std::vector<passwords::Login_t>& login
 
     if (!aes.decrypt(cryptData, plainData))
     {
-        errorString += "Deryption failed";
+        errorString += "Decryption failed";
         return false;
     }
     if (!VerifyChecksum(plainData))

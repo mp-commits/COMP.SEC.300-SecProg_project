@@ -11,7 +11,24 @@
 
 #include "passwords/passwords.hpp"
 
+#include <iostream>
+
 using namespace passwords;
+
+bool passwords::util::StringIsValid(const std::string& str)
+{
+    const std::string allowedCharacters = " abcdefghijklmnopqrstuvwxyzäöåABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÅ0123456789!@#$%^&*()_-+=[]{};:,.<>?/~";
+
+    for (auto c: str)
+    {
+        if (allowedCharacters.find(c) == std::string::npos)
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
 
 bool PasswordManager::RemoveLogin(const size_t idx)
 {
@@ -26,7 +43,7 @@ bool PasswordManager::RemoveLogin(const size_t idx)
 
 bool PasswordManager::AddLogin(const Login_t& login)
 {
-    if (!Exists(login))
+    if (LoginIsValid(login) && !Exists(login))
     {
         m_logins.push_back(login);
         return true;
@@ -44,4 +61,27 @@ bool PasswordManager::Exists(const Login_t& login)
         }
     }
     return false;
+}
+
+bool PasswordManager::LoginIsValid(const Login_t& login)
+{
+    if (login.password.empty() || (login.url.empty() && login.username.empty()))
+    {
+        // Password must not be empty!
+        // URL and/or username must exit!
+        return false;
+    }
+
+    bool valid = util::StringIsValid(login.password);
+
+    if (valid && !login.url.empty())
+    {
+        valid &= util::StringIsValid(login.url);
+    }
+    if (valid && !login.username.empty())
+    {
+        valid &= util::StringIsValid(login.username);
+    }
+
+    return valid;
 }

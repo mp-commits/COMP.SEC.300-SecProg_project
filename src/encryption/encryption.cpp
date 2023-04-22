@@ -171,7 +171,7 @@ bool AESGCM::encrypt(const ByteVector_t& data_in, ByteVector_t& data_out)
     EVP_EncryptFinal(cipher, &data_out.data()[HEADER_SIZE+size], &finalSize);
     EVP_CIPHER_CTX_ctrl(cipher, EVP_CTRL_GCM_GET_TAG, 16, tag);
 
-    std::copy( tag, tag+TAG_SIZE, data_out.begin());
+    std::copy(tag, tag+TAG_SIZE, data_out.begin());
     std::copy(iv, iv+IV_SIZE, data_out.begin()+IV_SIZE);
     data_out.resize(HEADER_SIZE + size + finalSize);
 
