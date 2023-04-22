@@ -50,5 +50,8 @@ void SERVICES_RunAddPassword(passwords::PasswordManager& manager, StringVector_t
     }
 
     Login_t login(domain, name, password);
-    manager.AddLogin(login);
+    if (manager.AddLogin(login))
+    {
+        manager.SetDataSaved(false);
+    }
 }

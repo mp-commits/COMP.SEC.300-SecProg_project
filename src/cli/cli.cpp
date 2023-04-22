@@ -104,7 +104,11 @@ static bool TryRunCommand(PasswordManager& manager, string command, StringVector
 
     if (MatchCommand(command, COMMAND_EXIT, 1))
     {
-        SERVICES_RunSavePasswords(manager, args);
+        if (!manager.GetDataSaved())
+        {
+            PrintError("Unsaved data in the manager. Running save service.");
+            SERVICES_RunSavePasswords(manager, args);
+        }
         exit = true;
     }
     else if (MatchCommand(command, COMMAND_HELP))

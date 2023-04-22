@@ -13,6 +13,8 @@
 #include "boost/json.hpp"
 #include "encryption/sha256.hpp"
 #include "encryption/util.hpp"
+#include "services/saltidservice.hpp"
+#include "project_definitions.hpp"
 
 #include <sstream>
 #include <iomanip>
@@ -23,7 +25,6 @@ using namespace encryption;
 using namespace encryptionUtil;
 using namespace boost::json;
 
-#define SALT_SIZE (32U)
 
 namespace passwords
 {
@@ -96,20 +97,31 @@ bool CryptFile::Load(std::ifstream& file, std::vector<passwords::Login_t>& login
     size_t fileSize = file.tellg();
     file.seekg(0, std::ios_base::beg);
 
-    if (fileSize <= SALT_SIZE)
+    if (fileSize <= PROJECT_SALT_SIZE + PROJECT_ID_HEADER_SIZE)
     {
         errorString += "Invalid file content";
         return false;
     }
     
-    const size_t cryptDataLength = fileSize - SALT_SIZE;
+    const size_t cryptDataLength = fileSize - (PROJECT_SALT_SIZE + PROJECT_ID_HEADER_SIZE);
 
-    ByteVector_t salt(SALT_SIZE);
+    ByteVector_t header(PROJECT_ID_HEADER_SIZE);
+    ByteVector_t salt(PROJECT_SALT_SIZE);
     ByteVector_t cryptData(cryptDataLength);
     ByteVector_t plainData;
 
-    file.read((char*)salt.data(), SALT_SIZE);
+    file.read((char*)header.data(), PROJECT_ID_HEADER_SIZE);
+
+    if (!IDSERVICE_IsApplicationHeader(header))
+    {
+        errorString += "Not a manager container file";
+        return false;
+    }
+
+    file.read((char*)salt.data(), PROJECT_SALT_SIZE);
     file.read((char*)cryptData.data(), cryptDataLength);
+
+    IDSERVICE_AddId(salt);
 
     EVPKDF der(m_password, salt);
     ENCRYPTION_Key256_t key = der.derive256();
@@ -150,8 +162,10 @@ bool CryptFile::Save(std::ofstream& file, const std::vector<passwords::Login_t>&
         ByteVector_t plainData = StringToVector(ss.str());
         WriteChecksum(plainData);
 
-        ByteVector_t salt(SALT_SIZE);
-        GenerateRandom(salt.data(), SALT_SIZE);
+        ByteVector_t salt(PROJECT_SALT_SIZE);
+        GenerateRandom(salt.data(), PROJECT_SALT_SIZE);
+
+        IDSERVICE_AddId(salt);
 
         EVPKDF der(m_password, salt);
 
@@ -160,6 +174,11 @@ bool CryptFile::Save(std::ofstream& file, const std::vector<passwords::Login_t>&
 
         ByteVector_t cryptData;
         aes.encrypt(plainData, cryptData);
+
+        for (auto c: IDSERVICE_GetApplicationHeader())
+        {
+            file.put(c);
+        }
 
         for (auto c: salt)
         {

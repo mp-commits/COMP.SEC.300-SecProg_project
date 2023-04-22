@@ -49,12 +49,13 @@ typedef struct Login {
 
 class PasswordManager {
 public:
-    PasswordManager() : m_logins({}) {} 
+    PasswordManager() : m_logins({}), m_dataSaved(true) {} 
     ~PasswordManager() {}
 
     bool RemoveLogin(const size_t idx);
 
     bool AddLogin(const Login_t& login);
+
 
     size_t Count() const
     {
@@ -81,10 +82,22 @@ public:
         return m_logins;
     }
 
+    void SetDataSaved(bool set)
+    {
+        m_dataSaved = set;
+    }
+
+    bool GetDataSaved()
+    {
+        return m_dataSaved;
+    }
+
 private:
     bool Exists(const Login_t& login);
     bool LoginIsValid(const Login_t& login);
+
     std::vector<Login_t> m_logins;
+    bool m_dataSaved;
 };
 
 } // namespace passwords

@@ -1,5 +1,16 @@
 project(manager_services)
 
+add_library(idservice-static
+    STATIC
+        saltidservice.cpp
+)
+
+target_include_directories(idservice-static
+    PUBLIC
+        include
+        ${COMMON_INCLUDE_DIR}
+)
+
 add_library(${PROJECT_NAME}-static 
     STATIC 
         add.cpp
@@ -23,4 +34,5 @@ target_link_libraries(${PROJECT_NAME}-static
         encryption-static
         fileops-static
         passwords-static
+        idservice-static
 )

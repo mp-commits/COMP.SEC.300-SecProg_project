@@ -16,4 +16,5 @@ target_link_libraries(${PROJECT_NAME}-static
         Boost::json
         encryption-static
         passwords-static
+        idservice-static
 )

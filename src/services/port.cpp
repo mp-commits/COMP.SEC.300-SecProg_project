@@ -141,6 +141,11 @@ static void ImportFromFile(ifstream& file, passwords::PasswordManager& manager)
         }
     }
 
+    if (accepted > 0U)
+    {
+        manager.SetDataSaved(false);
+    }
+
     cout << "Parsed " << processed << " logins, " << accepted << " imported, " << failed << " duplicates." << endl;
 }
 
