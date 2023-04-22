@@ -15,6 +15,7 @@
 
 #include <openssl/aes.h>
 #include <openssl/evp.h>
+#include <openssl/kdf.h>
 #include <openssl/rand.h>
 #include <openssl/sha.h>
 
@@ -40,17 +41,92 @@ static void InitSSL()
     }
 }
 
-AESGCM::AESGCM(const AESGCM_Key128_t& key) : m_keyType(KEY_TYPE_128), m_key(key)
+void encryption::GenerateRandom(uint8_t* buffer, size_t count)
+{
+    if (buffer)
+    {
+        RAND_bytes(buffer, count);
+    }
+}
+
+template<size_t N>
+void DeriveKey(std::array<uint8_t, N>& derived, std::string& pw, ByteVector_t& salt)
+{
+    EVP_KDF *kdf;
+    EVP_KDF_CTX *kctx = NULL;
+    OSSL_PARAM params[5], *p = params;
+
+    /* Find and allocate a context for the HKDF algorithm */
+    if ((kdf = EVP_KDF_fetch(NULL, "hkdf", NULL)) == NULL) {
+        std::runtime_error("EVP_KDF_fetch");
+    }
+
+    kctx = EVP_KDF_CTX_new(kdf);
+    EVP_KDF_free(kdf);    /* The kctx keeps a reference so this is safe */
+    if (kctx == NULL) {
+        std::runtime_error("EVP_KDF_CTX_new");
+    }
+
+    std::string digest = "sha256";
+    std::string label = "label";
+
+    /* Build up the parameters for the derivation */
+    *p++ = OSSL_PARAM_construct_utf8_string("digest", digest.data(), digest.size());
+    *p++ = OSSL_PARAM_construct_octet_string("salt", reinterpret_cast<void*>(salt.data()), salt.size());
+    *p++ = OSSL_PARAM_construct_octet_string("key", reinterpret_cast<void*>(pw.data()), pw.size());
+    *p++ = OSSL_PARAM_construct_octet_string("info", reinterpret_cast<void*>(label.data()), label.size());
+    *p = OSSL_PARAM_construct_end();
+
+    if (EVP_KDF_CTX_set_params(kctx, params) <= 0) {
+        std::runtime_error("EVP_KDF_CTX_set_params");
+    }
+
+    /* Do the derivation */
+    if (EVP_KDF_derive(kctx, derived.data(), derived.size(), NULL) <= 0) {
+        std::runtime_error("EVP_KDF_derive");
+    }
+
+    EVP_KDF_CTX_free(kctx);
+}
+
+EVPKDF::EVPKDF(const std::string& pw, const ByteVector_t& salt) : m_pw(pw), m_salt(salt)
 {
     InitSSL();
 }
 
-AESGCM::AESGCM(const AESGCM_Key192_t& key) : m_keyType(KEY_TYPE_192), m_key(key)
+ENCRYPTION_Key128_t EVPKDF::derive128()
+{
+    ENCRYPTION_Key128_t key;
+    DeriveKey<key.size()>(key, m_pw, m_salt);
+    return key;
+}
+
+ENCRYPTION_Key192_t EVPKDF::derive192()
+{
+    ENCRYPTION_Key192_t key;
+    DeriveKey<key.size()>(key, m_pw, m_salt);
+    return key;
+}
+
+ENCRYPTION_Key256_t EVPKDF::derive256()
+{
+    ENCRYPTION_Key256_t key;
+    DeriveKey<key.size()>(key, m_pw, m_salt);
+    return key;
+}
+
+
+AESGCM::AESGCM(const ENCRYPTION_Key128_t& key) : m_keyType(KEY_TYPE_128), m_key(key)
 {
     InitSSL();
 }
 
-AESGCM::AESGCM(const AESGCM_Key256_t& key) : m_keyType(KEY_TYPE_256), m_key(key)
+AESGCM::AESGCM(const ENCRYPTION_Key192_t& key) : m_keyType(KEY_TYPE_192), m_key(key)
+{
+    InitSSL();
+}
+
+AESGCM::AESGCM(const ENCRYPTION_Key256_t& key) : m_keyType(KEY_TYPE_256), m_key(key)
 {
     InitSSL();
 }

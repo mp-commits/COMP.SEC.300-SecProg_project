@@ -74,28 +74,13 @@ void SERVICES_RunLoadPasswords(passwords::PasswordManager& manager, StringVector
         getline(cin, password);
     }
 
-    ByteVector_t keySha = CalculateSHA256(StringToVector(password));
-    AESGCM_Key256_t key;
-    
-    if (keySha.size() == key.size())
-    {
-        for (size_t i = 0; i < key.size(); i++)
-        {
-            key[i] = keySha[i];
-        }
-    }
-    else
-    {
-        return;
-    }
-
     std::ifstream inputFile(filename, std::ios_base::in);
 
     if (inputFile.good())
     {
         string errStr;
         std::cout << "Loading from '" << filename << "'" << std::endl;
-        CryptFile crypt(key);
+        CryptFile crypt(password);
         std::vector<passwords::Login_t> logins;
         if(!crypt.Load(inputFile, logins, errStr))
         {

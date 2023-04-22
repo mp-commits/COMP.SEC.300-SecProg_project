@@ -23,6 +23,8 @@ using namespace encryption;
 using namespace encryptionUtil;
 using namespace boost::json;
 
+#define SALT_SIZE (32U)
+
 namespace passwords
 {
 
@@ -80,7 +82,7 @@ static void MakeLogins(const value& jv, std::vector<Login_t>& logins)
     }
 }
 
-CryptFile::CryptFile(const encryption::AESGCM& aes) : m_aes(aes)
+CryptFile::CryptFile(const std::string& password) : m_password(password)
 {
 
 }
@@ -93,15 +95,30 @@ CryptFile::~CryptFile()
 bool CryptFile::Load(std::ifstream& file, std::vector<passwords::Login_t>& logins, std::string& errorString)
 {
     file.seekg(0, std::ios_base::end);
-    size_t length = file.tellg();
+    size_t fileSize = file.tellg();
     file.seekg(0, std::ios_base::beg);
 
-    ByteVector_t cryptData(length);
+    if (fileSize <= SALT_SIZE)
+    {
+        errorString += "Invalid file content";
+        return false;
+    }
+    
+    const size_t cryptDataLength = fileSize - SALT_SIZE;
+
+    ByteVector_t salt(SALT_SIZE);
+    ByteVector_t cryptData(cryptDataLength);
     ByteVector_t plainData;
 
-    file.read((char*)cryptData.data(), length);
+    file.read((char*)salt.data(), SALT_SIZE);
+    file.read((char*)cryptData.data(), cryptDataLength);
 
-    if (!m_aes.decrypt(cryptData, plainData))
+    EVPKDF der(m_password, salt);
+    ENCRYPTION_Key256_t key = der.derive256();
+
+    AESGCM aes(key);
+
+    if (!aes.decrypt(cryptData, plainData))
     {
         errorString += "Deryption failed";
         return false;
@@ -132,11 +149,24 @@ bool CryptFile::Save(std::ofstream& file, const std::vector<passwords::Login_t>&
         std::stringstream ss;
         ss << jv;
 
-        ByteVector_t cryptData;
         ByteVector_t plainData = StringToVector(ss.str());
-
         WriteChecksum(plainData);
-        m_aes.encrypt(plainData, cryptData);
+
+        ByteVector_t salt(SALT_SIZE);
+        GenerateRandom(salt.data(), SALT_SIZE);
+
+        EVPKDF der(m_password, salt);
+
+        ENCRYPTION_Key256_t key = der.derive256();
+        AESGCM aes(key);
+
+        ByteVector_t cryptData;
+        aes.encrypt(plainData, cryptData);
+
+        for (auto c: salt)
+        {
+            file.put(c);
+        }
 
         for (auto c: cryptData)
         {

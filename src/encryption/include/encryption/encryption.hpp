@@ -20,16 +20,32 @@
 namespace encryption
 {
 
-typedef std::array<uint8_t, 16> AESGCM_Key128_t;
-typedef std::array<uint8_t, 24> AESGCM_Key192_t;
-typedef std::array<uint8_t, 32> AESGCM_Key256_t;
+typedef std::array<uint8_t, 16> ENCRYPTION_Key128_t;
+typedef std::array<uint8_t, 24> ENCRYPTION_Key192_t;
+typedef std::array<uint8_t, 32> ENCRYPTION_Key256_t;
+
+void GenerateRandom(uint8_t* buffer, size_t count);
+
+class EVPKDF 
+{
+public:
+    EVPKDF(const std::string& pw, const ByteVector_t& salt);
+
+    ENCRYPTION_Key128_t derive128();
+    ENCRYPTION_Key192_t derive192();
+    ENCRYPTION_Key256_t derive256();
+
+private:
+    std::string m_pw;
+    ByteVector_t m_salt;
+};
 
 class AESGCM 
 {
 public:
-    AESGCM(const AESGCM_Key128_t& key);
-    AESGCM(const AESGCM_Key192_t& key);
-    AESGCM(const AESGCM_Key256_t& key);
+    AESGCM(const ENCRYPTION_Key128_t& key);
+    AESGCM(const ENCRYPTION_Key192_t& key);
+    AESGCM(const ENCRYPTION_Key256_t& key);
     ~AESGCM();
 
     bool encrypt(const ByteVector_t& data_in, ByteVector_t& data_out);
@@ -48,12 +64,12 @@ private:
     
     const union key
     {
-        key(AESGCM_Key128_t k) : k128(k) {}
-        key(AESGCM_Key192_t k) : k192(k) {}
-        key(AESGCM_Key256_t k) : k256(k) {}
-        AESGCM_Key128_t k128;
-        AESGCM_Key192_t k192;
-        AESGCM_Key256_t k256;
+        key(ENCRYPTION_Key128_t k) : k128(k) {}
+        key(ENCRYPTION_Key192_t k) : k192(k) {}
+        key(ENCRYPTION_Key256_t k) : k256(k) {}
+        ENCRYPTION_Key128_t k128;
+        ENCRYPTION_Key192_t k192;
+        ENCRYPTION_Key256_t k256;
     } m_key;
 };
 

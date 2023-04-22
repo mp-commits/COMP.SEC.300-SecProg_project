@@ -33,12 +33,30 @@ static void CompareVectors(const ByteVector_t& a, const ByteVector_t& b)
     }
 }
 
+TEST(TEST_SUITE_NAME, deriveKey)
+{
+    const string password = "SecretKey";
+    const ByteVector_t salt = {1, 3, 5, 7, 9};
+    const ByteVector_t salt2 = {1, 2, 5, 7, 9};
+
+    EVPKDF der(password, salt);
+    EVPKDF der2(password, salt);
+    EVPKDF der3(password, salt2);
+
+    ENCRYPTION_Key128_t key = der.derive128();
+    ENCRYPTION_Key128_t key2 = der2.derive128();
+    ENCRYPTION_Key128_t key3 = der3.derive128();
+
+    EXPECT_EQ(key, key2);
+    EXPECT_NE(key, key3);
+}
+
 TEST(TEST_SUITE_NAME, invalidInput)
 {
     ByteVector_t empty(0);
     ByteVector_t output = {1, 2, 3, 4};
     const ByteVector_t reference(output);
-    AESGCM_Key128_t key;
+    ENCRYPTION_Key128_t key;
 
     AESGCM aes(key);
     EXPECT_FALSE(aes.encrypt(empty, output));
@@ -51,7 +69,7 @@ TEST(TEST_SUITE_NAME, invalidInput)
 
 TEST(TEST_SUITE_NAME, aes128keyEncryptBytesBasic)
 {
-    const AESGCM_Key128_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
+    const ENCRYPTION_Key128_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
 
     const ByteVector_t testData = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
     ByteVector_t encryptedData;
@@ -70,7 +88,7 @@ TEST(TEST_SUITE_NAME, aes128keyEncryptBytesBasic)
 TEST(TEST_SUITE_NAME, aes128keyEncryptBytesLongData)
 {
     constexpr size_t TEST_DATA_LENGTH = 1024 * 1024; // 1 MB
-    const AESGCM_Key128_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
+    const ENCRYPTION_Key128_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
     AESGCM crypter(key);
 
     ByteVector_t testData(TEST_DATA_LENGTH, 0x00);
@@ -90,7 +108,7 @@ TEST(TEST_SUITE_NAME, aes128keyEncryptBytesLongData)
 
 TEST(TEST_SUITE_NAME, aes128keyEncryptBytesMultiInstance)
 {
-    const AESGCM_Key128_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
+    const ENCRYPTION_Key128_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
     const ByteVector_t testData = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
     ByteVector_t encryptedData;
 
@@ -115,7 +133,7 @@ TEST(TEST_SUITE_NAME, aes128keyEncryptBytesMultiInstance)
 TEST(TEST_SUITE_NAME, aes128keyEncryptBytesLongDataMultiInstance)
 {
     constexpr size_t TEST_DATA_LENGTH = 1024 * 1024; // 1 MB
-    const AESGCM_Key128_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
+    const ENCRYPTION_Key128_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
     AESGCM encrypter(key);
 
     ByteVector_t testData(TEST_DATA_LENGTH, 0x00);
@@ -137,8 +155,8 @@ TEST(TEST_SUITE_NAME, aes128keyEncryptBytesLongDataMultiInstance)
 
 TEST(TEST_SUITE_NAME, aes128WrongKey)
 {
-    const AESGCM_Key128_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
-    const AESGCM_Key128_t wrongKey = {0};
+    const ENCRYPTION_Key128_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
+    const ENCRYPTION_Key128_t wrongKey = {0};
 
     const ByteVector_t testData = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
     ByteVector_t encryptedData;
@@ -159,7 +177,7 @@ TEST(TEST_SUITE_NAME, aes128WrongKey)
 
 TEST(TEST_SUITE_NAME, aes256keyEncryptBytesBasic)
 {
-    const AESGCM_Key256_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
+    const ENCRYPTION_Key256_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
 
     const ByteVector_t testData = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
     ByteVector_t encryptedData;
@@ -178,7 +196,7 @@ TEST(TEST_SUITE_NAME, aes256keyEncryptBytesBasic)
 TEST(TEST_SUITE_NAME, aes256keyEncryptBytesLongData)
 {
     constexpr size_t TEST_DATA_LENGTH = 1024 * 1024; // 1 MB
-    const AESGCM_Key256_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
+    const ENCRYPTION_Key256_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
     AESGCM crypter(key);
 
     ByteVector_t testData(TEST_DATA_LENGTH, 0x00);
@@ -198,7 +216,7 @@ TEST(TEST_SUITE_NAME, aes256keyEncryptBytesLongData)
 
 TEST(TEST_SUITE_NAME, aes256keyEncryptBytesMultiInstance)
 {
-    const AESGCM_Key256_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
+    const ENCRYPTION_Key256_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
     const ByteVector_t testData = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
     ByteVector_t encryptedData;
 
@@ -223,7 +241,7 @@ TEST(TEST_SUITE_NAME, aes256keyEncryptBytesMultiInstance)
 TEST(TEST_SUITE_NAME, aes256keyEncryptBytesLongDataMultiInstance)
 {
     constexpr size_t TEST_DATA_LENGTH = 1024 * 1024; // 1 MB
-    const AESGCM_Key256_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
+    const ENCRYPTION_Key256_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
     AESGCM encrypter(key);
 
     ByteVector_t testData(TEST_DATA_LENGTH, 0x00);
@@ -245,8 +263,8 @@ TEST(TEST_SUITE_NAME, aes256keyEncryptBytesLongDataMultiInstance)
 
 TEST(TEST_SUITE_NAME, aes256WrongKey)
 {
-    const AESGCM_Key256_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
-    const AESGCM_Key256_t wrongKey = {0};
+    const ENCRYPTION_Key256_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
+    const ENCRYPTION_Key256_t wrongKey = {0};
 
     const ByteVector_t testData = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
     ByteVector_t encryptedData;
@@ -267,7 +285,7 @@ TEST(TEST_SUITE_NAME, aes256WrongKey)
 
 TEST(TEST_SUITE_NAME, aes192keyEncryptBytesBasic)
 {
-    const AESGCM_Key192_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 1,2,3,4,5,6,7,8};
+    const ENCRYPTION_Key192_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 1,2,3,4,5,6,7,8};
 
     const ByteVector_t testData = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 1,2,3,4,5,6,7,8};
     ByteVector_t encryptedData;
@@ -286,7 +304,7 @@ TEST(TEST_SUITE_NAME, aes192keyEncryptBytesBasic)
 TEST(TEST_SUITE_NAME, aes192keyEncryptBytesLongData)
 {
     constexpr size_t TEST_DATA_LENGTH = 1024 * 1024; // 1 MB
-    const AESGCM_Key192_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 1,2,3,4,5,6,7,8};
+    const ENCRYPTION_Key192_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 1,2,3,4,5,6,7,8};
     AESGCM crypter(key);
 
     ByteVector_t testData(TEST_DATA_LENGTH, 0x00);
@@ -306,7 +324,7 @@ TEST(TEST_SUITE_NAME, aes192keyEncryptBytesLongData)
 
 TEST(TEST_SUITE_NAME, aes192keyEncryptBytesMultiInstance)
 {
-    const AESGCM_Key192_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 1,2,3,4,5,6,7,8};
+    const ENCRYPTION_Key192_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 1,2,3,4,5,6,7,8};
     const ByteVector_t testData = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 1,2,3,4,5,6,7,8};
     ByteVector_t encryptedData;
 
@@ -331,7 +349,7 @@ TEST(TEST_SUITE_NAME, aes192keyEncryptBytesMultiInstance)
 TEST(TEST_SUITE_NAME, aes192keyEncryptBytesLongDataMultiInstance)
 {
     constexpr size_t TEST_DATA_LENGTH = 1024 * 1024; // 1 MB
-    const AESGCM_Key192_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 1,2,3,4,5,6,7,8};
+    const ENCRYPTION_Key192_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 1,2,3,4,5,6,7,8};
     AESGCM encrypter(key);
 
     ByteVector_t testData(TEST_DATA_LENGTH, 0x00);
@@ -353,8 +371,8 @@ TEST(TEST_SUITE_NAME, aes192keyEncryptBytesLongDataMultiInstance)
 
 TEST(TEST_SUITE_NAME, aes192WrongKey)
 {
-    const AESGCM_Key192_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 1,2,3,4,5,6,7,8};
-    const AESGCM_Key192_t wrongKey = {0};
+    const ENCRYPTION_Key192_t key = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 1,2,3,4,5,6,7,8};
+    const ENCRYPTION_Key192_t wrongKey = {0};
 
     const ByteVector_t testData = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 1,2,3,4,5,6,7,8};
     ByteVector_t encryptedData;

@@ -57,28 +57,13 @@ void SERVICES_RunSavePasswords(passwords::PasswordManager& manager, StringVector
         getline(cin, password);
     }
 
-    ByteVector_t keySha = CalculateSHA256(StringToVector(password));
-    AESGCM_Key256_t key;
-    
-    if (keySha.size() == key.size())
-    {
-        for (size_t i = 0; i < key.size(); i++)
-        {
-            key[i] = keySha[i];
-        }
-    }
-    else
-    {
-        return;
-    }
-
     std::ofstream outputFile(filename, std::ios_base::trunc | std::ios_base::out);
 
     if (outputFile.good())
     {
         string errStr;
         std::cout << "Saving to '" << filename << "'" << std::endl;
-        CryptFile crypt(key);
+        CryptFile crypt(password);
         crypt.Save(outputFile, manager.GetLoginVector(), errStr);
         outputFile.close();
     }
