@@ -27,10 +27,6 @@ using namespace fileops;
 using namespace passwords;
 using namespace std;
 
-#define FILE_PROMPT "Enter file name (empty for default): "
-#define PASSWORD_PROMPT "Enter file password: "
-#define DEFAULT_FILE_NAME "manager_container.crypt"
-
 static bool CheckFileCanBeWritten(string filename)
 {
     bool allowWrite = false;
@@ -102,7 +98,7 @@ void SERVICES_RunSavePasswords(passwords::PasswordManager& manager, StringVector
     }
     else
     {
-        cout << FILE_PROMPT;
+        cout << PROMPT_STR_FILE_ENTRY_DEFAULT;
         getline(cin, filename);
         
         if (filename.empty())
@@ -110,7 +106,7 @@ void SERVICES_RunSavePasswords(passwords::PasswordManager& manager, StringVector
             filename = DEFAULT_FILE_NAME;
         }
 
-        cout << PASSWORD_PROMPT;
+        cout << PROMPT_STR_PASSWORD;
         getline(cin, password);
     }
 
@@ -121,7 +117,7 @@ void SERVICES_RunSavePasswords(passwords::PasswordManager& manager, StringVector
         if (outputFile.good())
         {
             string errStr;
-            std::cout << "Saving to '" << filename << "'" << std::endl;
+            std::cout << PROMPT_STR_WRITING_FILE(filename) << std::endl;
             CryptFile crypt(password);
             crypt.Save(outputFile, manager.GetLoginVector(), errStr);
             outputFile.close();
@@ -130,12 +126,12 @@ void SERVICES_RunSavePasswords(passwords::PasswordManager& manager, StringVector
         }
         else
         {
-            std::cout << "Failed to save to '" << filename << "': " << std::strerror(errno) << std::endl;
+            std::cout << ERR_STR_FILE_OPEN(filename) << std::strerror(errno) << std::endl;
         }
     }
     else
     {
-        cout << "Invalid or illegal file. No data written!" << endl;
+        cout << ERR_STR_FILE << endl;
     }
 
 }

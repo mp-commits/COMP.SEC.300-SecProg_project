@@ -33,9 +33,9 @@ void tag_invoke(const value_from_tag&, value& jv, Login_t const& l )
 {
     // Assign a JSON value
     jv = {
-        { "url", l.url },
-        { "username", l.username },
-        { "password", l.password }
+        { KEY_STR_URL, l.url },
+        { KEY_STR_USERNAME, l.username },
+        { KEY_STR_USERNAME, l.password }
     };
 }
 
@@ -56,9 +56,9 @@ std::string AttemptToGetString(const value& jv, const std::string keyword)
 
 Login_t tag_invoke(const value_to_tag<Login_t>&, const value& jv)
 {
-    std::string username = AttemptToGetString(jv, "username");
-    std::string url = AttemptToGetString(jv, "url");
-    std::string password = AttemptToGetString(jv, "password");
+    std::string username = AttemptToGetString(jv, KEY_STR_USERNAME);
+    std::string url = AttemptToGetString(jv, KEY_STR_URL);
+    std::string password = AttemptToGetString(jv, KEY_STR_PASSWORD);
 
     return Login_t(url, username, password);
 }
@@ -99,7 +99,7 @@ bool CryptFile::Load(std::ifstream& file, std::vector<passwords::Login_t>& login
 
     if (fileSize <= PROJECT_SALT_SIZE + PROJECT_ID_HEADER_SIZE)
     {
-        errorString += "Invalid file content";
+        errorString += ERR_STR_FILE;
         return false;
     }
     
@@ -114,7 +114,7 @@ bool CryptFile::Load(std::ifstream& file, std::vector<passwords::Login_t>& login
 
     if (!IDSERVICE_IsApplicationHeader(header))
     {
-        errorString += "Not a manager container file";
+        errorString += ERROR_STR_INCOMPATIBLE_FILE;
         return false;
     }
 
@@ -130,12 +130,12 @@ bool CryptFile::Load(std::ifstream& file, std::vector<passwords::Login_t>& login
 
     if (!aes.decrypt(cryptData, plainData))
     {
-        errorString += "Decryption failed";
+        errorString += ERR_STR_DECRYPT;
         return false;
     }
     if (!VerifyChecksum(plainData))
     {
-        errorString += "Checksum failed";
+        errorString += ERR_STR_CHECKSUM;
         return false;
     }
     

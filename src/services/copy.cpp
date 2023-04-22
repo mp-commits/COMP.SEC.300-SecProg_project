@@ -11,6 +11,7 @@
 
 #include "services/managerservices.hpp"
 #include "clip.h"
+#include "project_definitions.hpp"
 
 #include <iostream>
 
@@ -39,16 +40,16 @@ void SERVICES_RunCopyPassword(passwords::PasswordManager& manager, StringVector_
             }
             else
             {
-                cout << "Invalid index!" << endl;
+                cout << ERR_STR_IDX << endl;
             }
         }
         catch (...)
         {
-            cout << "Something went wrong" << endl;
+            cout << ERR_STR_GERENIC << endl;
         }
     }
     else
     {
-        cout << "Invalid arguments!" << endl;
+        cout << ERR_STR_ARG << endl;
     }
 }

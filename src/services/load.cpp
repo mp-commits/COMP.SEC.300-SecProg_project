@@ -13,6 +13,7 @@
 #include "cryptfile/cryptfile.hpp"
 #include "encryption/util.hpp"
 #include "encryption/sha256.hpp"
+#include "project_definitions.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -25,8 +26,7 @@ using namespace fileops;
 using namespace passwords;
 using namespace std;
 
-#define FILE_PROMPT "Entern input filename (empty for default): "
-#define PASSWORD_PROMPT "Enter file password: "
+#define FILE_PROMPT "Enter input filename (empty for default): "
 #define DEFAULT_FILE_NAME "manager_container.crypt"
 
 static void RunAddLogins(const vector<Login_t>& logins, PasswordManager& manager)
@@ -63,7 +63,7 @@ void SERVICES_RunLoadPasswords(passwords::PasswordManager& manager, StringVector
         {
             filename = newFile;
         }
-        cout << PASSWORD_PROMPT;
+        cout << PROMPT_STR_PASSWORD;
         getline(cin, password);
     }
 
@@ -72,7 +72,6 @@ void SERVICES_RunLoadPasswords(passwords::PasswordManager& manager, StringVector
     if (inputFile.good())
     {
         string errStr;
-        std::cout << "Loading from '" << filename << "'" << std::endl;
         CryptFile crypt(password);
         std::vector<passwords::Login_t> logins;
 
@@ -86,6 +85,6 @@ void SERVICES_RunLoadPasswords(passwords::PasswordManager& manager, StringVector
     }
     else
     {
-        std::cout << "Failed to open '" << filename << "': " << std::strerror(errno) << std::endl;
+        std::cout << ERR_STR_FILE_OPEN(filename) << "': " << std::strerror(errno) << std::endl;
     }
 }

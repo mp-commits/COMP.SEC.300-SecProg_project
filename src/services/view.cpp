@@ -10,6 +10,7 @@
  */
 
 #include "services/managerservices.hpp"
+#include "project_definitions.hpp"
 #include <iostream>
 #include <iomanip>
 
@@ -84,12 +85,12 @@ void SERVICES_RunViewPasswords(passwords::PasswordManager& manager, StringVector
             }
             else
             {
-                cout << "Invalid index!";
+                cout << ERR_STR_IDX << endl;
             }
         }
         catch (...)
         {
-            cout << "Invalid argument: " << args[1] << endl;
+            cout << ERR_STR_ARG << ": " << args[1] << endl;
         }
     }
     else
@@ -116,7 +117,7 @@ void SERVICES_RunFindPassword(passwords::PasswordManager& manager, StringVector_
     }
     else
     {
-        cout << "Invalid arguments!" << endl;
+        cout << ERR_STR_ARG << endl;
     }
 }
 
@@ -139,16 +140,16 @@ void SERVICES_RunRemovePassword(passwords::PasswordManager& manager, StringVecto
             }
             else
             {
-                throw std::invalid_argument("Index too high!");
+                throw std::invalid_argument(ERR_STR_IDX);
             }
         }
         else
         {
-            throw std::invalid_argument("Wrong number of arguments!");
+            throw std::invalid_argument(ERR_STR_ARG);
         }
     }
     catch (...)
     {
-        cout << "Invalid arguments" << endl;
+        cout << ERR_STR_ARG << endl;
     }
 }

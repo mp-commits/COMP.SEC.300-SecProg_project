@@ -11,6 +11,7 @@
 
 #include "services/managerservices.hpp"
 #include "boost/tokenizer.hpp"
+#include "project_definitions.hpp"
 
 #include <algorithm>
 #include <cctype>
@@ -25,9 +26,6 @@ using namespace std;
 
 typedef std::map<std::string, size_t> KeyMap_t;
 
-#define KEY_URL "url"
-#define KEY_USERNAME "username"
-#define KEY_PASSWORD "password"
 #define OUTPUT_HEADER "\"url\",\"username\",\"password\""
 #define OUTPUT_SEPARATOR ','
 
@@ -112,16 +110,16 @@ static void ImportFromFile(ifstream& file, passwords::PasswordManager& manager)
             keys = GenerateKeys(tokens);
             firstLine = false;
 
-            bool allKeysOk = KeyExists(keys, KEY_URL) && KeyExists(keys, KEY_USERNAME) && KeyExists(keys, KEY_PASSWORD);
+            bool allKeysOk = KeyExists(keys, KEY_STR_URL) && KeyExists(keys, KEY_STR_USERNAME) && KeyExists(keys, KEY_STR_PASSWORD);
             if (!allKeysOk)
             {
-                cout << "Key detection failed. File may contain invalid data!" << endl;
+                cout << ERR_STR_FILE << endl;
                 return;
             }
         }
         else
         {
-            const size_t idxUrl = keys[KEY_URL], idxUsername = keys[KEY_USERNAME], idxPassword = keys[KEY_PASSWORD];
+            const size_t idxUrl = keys[KEY_STR_URL], idxUsername = keys[KEY_STR_USERNAME], idxPassword = keys[KEY_STR_PASSWORD];
             const size_t maxIdx = Max3(idxUrl, idxPassword, idxUsername);
             
             if (tokens.size() > maxIdx)
@@ -171,7 +169,7 @@ extern void SERVICES_RunImportPasswords(passwords::PasswordManager& manager, Str
 
     if (args.size() < 2)
     {
-        cout << "Enter import file: ";
+        cout << PROMPT_STR_FILE_ENTRY;
         getline(cin, filename);
     }
     else
@@ -183,7 +181,7 @@ extern void SERVICES_RunImportPasswords(passwords::PasswordManager& manager, Str
     
     if (!file.good())
     {
-        std::cout << "Failed to open '" << filename << "': " << std::strerror(errno) << std::endl;
+        std::cout << ERR_STR_FILE_OPEN(filename) << ": " << std::strerror(errno) << std::endl;
         return;
     }
 
@@ -197,7 +195,7 @@ extern void SERVICES_RunExportPasswords(passwords::PasswordManager& manager, Str
 
     if (args.size() < 2)
     {
-        cout << "Enter export file: ";
+        cout << PROMPT_STR_FILE_ENTRY;
         getline(cin, filename);
     }
     else
@@ -207,7 +205,7 @@ extern void SERVICES_RunExportPasswords(passwords::PasswordManager& manager, Str
 
     if (FileExists(filename))
     {
-        std::cout << "File already exits '" << filename << "'" << std::endl;
+        std::cout << ERR_STR_FILE_EXISTS(filename) << std::endl;
         return;
     }
     
@@ -215,12 +213,12 @@ extern void SERVICES_RunExportPasswords(passwords::PasswordManager& manager, Str
     
     if (!file.good())
     {
-        std::cout << "Failed to open '" << filename << "': " << std::strerror(errno) << std::endl;
+        std::cout << ERR_STR_FILE_OPEN(filename) << "': " << std::strerror(errno) << std::endl;
         file.close();
         return;
     }
 
-    cout << "Exporting to '" << filename << "'" << std::endl;
+    cout << PROMPT_STR_WRITING_FILE(filename) << std::endl;
 
     ExportToFile(file, manager);
 

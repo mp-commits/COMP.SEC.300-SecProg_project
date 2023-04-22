@@ -10,17 +10,11 @@
  */
 
 #include "services/managerservices.hpp"
+#include "project_definitions.hpp"
 #include <iostream>
 
 using namespace passwords;
 using namespace std;
-
-#define PROMPT_NAME "Name: "
-#define PROMPT_DOMAIN "Domain: "
-#define PROMPT_PASSWORD "Password: "
-
-#define ERROR_EMPTY_PASSWORD "Password cannot be empty"
-#define ERROR_EMPTY_ID "Both name and domain cannot be empty"
 
 void SERVICES_RunAddPassword(passwords::PasswordManager& manager, StringVector_t args)
 {
@@ -28,24 +22,24 @@ void SERVICES_RunAddPassword(passwords::PasswordManager& manager, StringVector_t
     string domain = "";
     string password = "";
 
-    cout << PROMPT_NAME;
+    cout << PROMPT_STR_NAME;
     getline(cin, name);
 
-    cout << PROMPT_DOMAIN;
+    cout << PROMPT_STR_DOMAIN;
     getline(cin, domain);
 
-    cout << PROMPT_PASSWORD;
+    cout << PROMPT_STR_PASSWORD;
     getline(cin, password);
 
     if (name.empty() && domain.empty())
     {
-        cout << ERROR_EMPTY_ID << endl;
+        cout << ERROR_STR_EMPTY_ID << endl;
         return;
     }
 
     if (password.empty())
     {
-        cout << ERROR_EMPTY_PASSWORD << endl;
+        cout << ERROR_STR_EMPTY_PASSWORD << endl;
         return;
     }
 
