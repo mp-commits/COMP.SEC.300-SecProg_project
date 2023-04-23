@@ -130,29 +130,36 @@ static bool TryRunCommand(PasswordManager& manager, string command, StringVector
 {
     bool success = true;
 
-    if (MatchCommand(command, COMMAND_EXIT, 1))
+    try
     {
-        if (!manager.GetDataSaved())
+        if (MatchCommand(command, COMMAND_EXIT, 1))
         {
-            PrintError("Unsaved data in the manager. Running save service.");
-            SERVICES_RunSavePasswords(manager, args);
-        }
-        exit = true;
-    }
-    else
-    {
-        success = false;
-
-        for (auto c: COMMANDS)
-        {
-            if (MatchCommand(command, c.cmd, c.letterAccessIdx))
+            if (!manager.GetDataSaved())
             {
-                c.func(manager, args);
+                PrintError("Unsaved data in the manager. Running save service.");
+                SERVICES_RunSavePasswords(manager, args);
+            }
+            exit = true;
+        }
+        else
+        {
+            success = false;
 
-                success = true;
-                break;
+            for (auto c: COMMANDS)
+            {
+                if (MatchCommand(command, c.cmd, c.letterAccessIdx))
+                {
+                    c.func(manager, args);
+
+                    success = true;
+                    break;
+                }
             }
         }
+    }
+    catch(...)
+    {
+        success = false;
     }
 
     return success;
