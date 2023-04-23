@@ -1,4 +1,4 @@
-message(STATUS "Fetching boost. DO NOT PANIC! This will take some time (up to 10 minutes)!")
+message(STATUS "Fetching boost. DO NOT PANIC! This will take some time (even 10+ minutes)!")
 include(FetchContent)
 
 set(BOOST_INCLUDE_LIBRARIES json tokenizer)
