@@ -17,7 +17,6 @@
 #include "project_definitions.hpp"
 
 #include <sstream>
-#include <iomanip>
 
 using namespace fileops;
 using namespace passwords;
@@ -35,7 +34,7 @@ void tag_invoke(const value_from_tag&, value& jv, Login_t const& l )
     jv = {
         { KEY_STR_URL, l.url },
         { KEY_STR_USERNAME, l.username },
-        { KEY_STR_USERNAME, l.password }
+        { KEY_STR_PASSWORD, l.password }
     };
 }
 

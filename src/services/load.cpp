@@ -67,7 +67,7 @@ void SERVICES_RunLoadPasswords(passwords::PasswordManager& manager, StringVector
         getline(cin, password);
     }
 
-    std::ifstream inputFile(filename, std::ios_base::in);
+    std::ifstream inputFile(filename, std::ios_base::in | std::ios_base::binary);
 
     if (inputFile.good())
     {

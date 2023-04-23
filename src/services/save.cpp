@@ -30,7 +30,7 @@ using namespace std;
 static bool CheckFileCanBeWritten(string filename)
 {
     bool allowWrite = false;
-    ifstream file(filename, std::ios::in | std::ios::ate);
+    ifstream file(filename, std::ios::in | std::ios::ate | std::ios::binary);
 
     if (file)
     {
@@ -112,7 +112,7 @@ void SERVICES_RunSavePasswords(passwords::PasswordManager& manager, StringVector
 
     if (CheckFileCanBeWritten(filename))
     {
-        std::ofstream outputFile(filename, std::ios_base::trunc | std::ios_base::out);
+        std::ofstream outputFile(filename, std::ios_base::trunc | std::ios_base::out | std::ios_base::binary);
 
         if (outputFile.good())
         {

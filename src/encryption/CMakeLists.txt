@@ -1,6 +1,11 @@
-include(FindPkgConfig)
-pkg_search_module(CRYPTO libcrypto REQUIRED)
-include_directories(${CRYPTO_INCLUDE_DIRS})
+if (WIN32)
+    find_library(CRYPTO_LIBRARIES NAMES libcrypto PATHS "C:/Program Files/OpenSSL-Win64/lib")
+    include_directories("C:/Program Files/OpenSSL-Win64/include")
+else()
+    include(FindPkgConfig)
+    pkg_search_module(CRYPTO libcrypto REQUIRED)
+    include_directories(${CRYPTO_INCLUDE_DIRS})
+endif()
 
 add_library(encryption-static 
     STATIC 

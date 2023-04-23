@@ -11,8 +11,6 @@
 
 #include "passwords/passwords.hpp"
 
-#include <iostream>
-
 using namespace passwords;
 
 bool passwords::util::StringIsValid(const std::string& str)
