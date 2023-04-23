@@ -9,6 +9,7 @@
  * 
  */
 
+#include <csignal>
 #include <iostream>
 #include <string>
 #include "cli/cli.hpp"
@@ -16,13 +17,20 @@
 #include "stringvector.hpp"
 
 using std::string;
-using std::cout;
 using passwords::PasswordManager;
 
 static PasswordManager f_manager;
 
+void ExitSignalHandler( int signum )
+{
+    std::cout << "Exiting..." << std::endl;
+    exit(signum);  
+}
+
 int main(int argc, char* argv[])
 {
+    signal(SIGINT, ExitSignalHandler);
+
     StringVector_t args;
     for (int i = 1; i < argc; i++)
     {
