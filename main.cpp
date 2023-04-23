@@ -29,14 +29,21 @@ void ExitSignalHandler( int signum )
 
 int main(int argc, char* argv[])
 {
-    signal(SIGINT, ExitSignalHandler);
-
-    StringVector_t args;
-    for (int i = 1; i < argc; i++)
+    try
     {
-        args.push_back(std::string(argv[i]));
-    }
+        signal(SIGINT, ExitSignalHandler);
 
-    CLI_RunCli(f_manager, args);
-    return 0;
+        StringVector_t args;
+        for (int i = 1; i < argc; i++)
+        {
+            args.push_back(std::string(argv[i]));
+        }
+        
+        CLI_RunCli(f_manager, args);
+        return 0;
+    }
+    catch (...)
+    {
+        return 1;
+    }
 }

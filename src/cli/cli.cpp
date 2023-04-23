@@ -134,6 +134,7 @@ static bool TryRunCommand(PasswordManager& manager, string command, StringVector
     {
         if (MatchCommand(command, COMMAND_EXIT, 1))
         {
+            // Check for exit command first
             if (!manager.GetDataSaved())
             {
                 PrintError("Unsaved data in the manager. Running save service.");
@@ -143,6 +144,7 @@ static bool TryRunCommand(PasswordManager& manager, string command, StringVector
         }
         else
         {
+            // Check for all other commands
             success = false;
 
             for (auto c: COMMANDS)
@@ -182,6 +184,7 @@ void CLI_RunCli(passwords::PasswordManager& manager, StringVector_t args)
         cout << CLI_HEADER;
         getline(cin, input);
         StringVector_t args = GetArgs(input, CLI_ARG_DELIM);
+        
         if (args.size() == 0)
         {
             PrintError(CLI_ERROR_MESSAGE(input));
@@ -190,6 +193,7 @@ void CLI_RunCli(passwords::PasswordManager& manager, StringVector_t args)
 
         string command = args[0];
         bool success = TryRunCommand(manager, command, args, exit);
+
         if (!success)
         {
             PrintError(CLI_ERROR_MESSAGE(input));
