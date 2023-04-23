@@ -1,0 +1,6 @@
+name,url,username,password,note
+Example Login,https://example.com,johndoe123,Pa$$w0rd!,
+Google Login,https://google.com,jane.smith456,StrongP@ssword!123,
+Facebook Login,https://facebook.com,michael.wilson789,MyFav0riteColorIsBlue!,
+Twitter Login,https://twitter.com,sarahlee321,Password1234@,
+LinkedIn Login,https://linkedin.com,robert.lee234,Bu$in3ssL1nk3din!,
