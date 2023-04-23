@@ -1,16 +1,24 @@
 # COMP.SEC.300-SecProg_project
 Project work for the course COMP.SEC.300-2022-2023-1 Secure Programming
 
+## Reqirements
+
+- CMake 3.11 or newer. Tested with version 3.20
+- OpenSSL 3.0. Tested with 3.0.4 (Linux) and 3.0.8 (Windows). See build istructions.
+- Internet connection. CMake needs to fetch libraries from GitHub.
+
 ## Building on Ubuntu/Pop-OS
 
 ### OpenSSL
+Tested with OpenSSL v3.0.4
+
 ```
 sudo apt install libssl-dev
 ```
 
 ### Build
 
-Tested with OpenSSL v3.0.4, GCC 12.2, CMake 3.20
+Tested with GCC 12.1.0 x86_64-linux-gnu
 
 ```
 mkdir build
@@ -31,7 +39,7 @@ Files\OpenSSL-Win64\bin\openssl.cfg
 
 ### Build
 
-tested with GCC 11.2.0 x86_64-w64-mingw32
+Tested with GCC 11.2.0 x86_64-w64-mingw32
 
 ```
 mkdir build

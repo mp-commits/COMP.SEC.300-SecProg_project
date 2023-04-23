@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.11)
 project(SECURE_PROGRAMMING_PASSWORD_MANAGER)
 set(EXECUTABLE_NAME manager)
 
