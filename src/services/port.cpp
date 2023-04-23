@@ -136,7 +136,7 @@ static void ImportFromFile(ifstream& file, passwords::PasswordManager& manager)
                 }
                 else
                 {
-                    std::runtime_error("invalid line");
+                    throw std::runtime_error("invalid line");
                 }
             }
         }

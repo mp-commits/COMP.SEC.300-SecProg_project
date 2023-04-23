@@ -58,13 +58,13 @@ void DeriveKey(std::array<uint8_t, N>& derived, std::string& pw, ByteVector_t& s
 
     /* Find and allocate a context for the HKDF algorithm */
     if ((kdf = EVP_KDF_fetch(nullptr, "hkdf", nullptr)) == nullptr) {
-        std::runtime_error("EVP_KDF_fetch");
+        throw std::runtime_error("EVP_KDF_fetch");
     }
 
     kctx = EVP_KDF_CTX_new(kdf);
     EVP_KDF_free(kdf);    /* The kctx keeps a reference so this is safe */
     if (kctx == nullptr) {
-        std::runtime_error("EVP_KDF_CTX_new");
+        throw std::runtime_error("EVP_KDF_CTX_new");
     }
 
     std::string digest = "sha256";
@@ -79,13 +79,13 @@ void DeriveKey(std::array<uint8_t, N>& derived, std::string& pw, ByteVector_t& s
 
     if (EVP_KDF_CTX_set_params(kctx, params) <= 0) {
         EVP_KDF_CTX_free(kctx);
-        std::runtime_error("EVP_KDF_CTX_set_params");
+        throw std::runtime_error("EVP_KDF_CTX_set_params");
     }
 
     /* Do the derivation */
     if (EVP_KDF_derive(kctx, derived.data(), derived.size(), nullptr) <= 0) {
         EVP_KDF_CTX_free(kctx);
-        std::runtime_error("EVP_KDF_derive");
+        throw std::runtime_error("EVP_KDF_derive");
     }
 
     EVP_KDF_CTX_free(kctx);
@@ -150,7 +150,7 @@ bool AESGCM::encrypt(const ByteVector_t& data_in, ByteVector_t& data_out)
 
     if (RAND_bytes(iv, sizeof(iv)) == 0)
     {
-        std::runtime_error("RAND_bytes");
+        throw std::runtime_error("RAND_bytes");
     }
 
     std::copy(iv, iv+IV_SIZE, data_out.begin()+IV_SIZE);
@@ -162,7 +162,7 @@ bool AESGCM::encrypt(const ByteVector_t& data_in, ByteVector_t& data_out)
 
     if (cipher == nullptr)
     {
-        std::runtime_error("EVP_CIPHER_CTX_new");
+        throw std::runtime_error("EVP_CIPHER_CTX_new");
     }
 
     int ret = 0;
@@ -183,7 +183,7 @@ bool AESGCM::encrypt(const ByteVector_t& data_in, ByteVector_t& data_out)
     if (ret == 0)
     {
         EVP_CIPHER_CTX_free(cipher);
-        std::runtime_error("EVP_EncryptInit");
+        throw std::runtime_error("EVP_EncryptInit");
     }
 
     if ((EVP_EncryptUpdate(cipher, &data_out.data()[HEADER_SIZE], &size, data_in.data(), data_in.size()) == 0)
@@ -191,7 +191,7 @@ bool AESGCM::encrypt(const ByteVector_t& data_in, ByteVector_t& data_out)
         || (EVP_CIPHER_CTX_ctrl(cipher, EVP_CTRL_GCM_GET_TAG, 16, tag) == 0))
     {
         EVP_CIPHER_CTX_free(cipher);
-        std::runtime_error("EVP_EncryptUpdate or EVP_EncryptFinal or EVP_CIPHER_CTX_ctrl");
+        throw std::runtime_error("EVP_EncryptUpdate or EVP_EncryptFinal or EVP_CIPHER_CTX_ctrl");
     }
 
     std::copy(tag, tag+TAG_SIZE, data_out.begin());
@@ -225,7 +225,7 @@ bool AESGCM::decrypt(const ByteVector_t& data_in, ByteVector_t& data_out)
 
     if (cipher == nullptr)
     {
-        std::runtime_error("EVP_CIPHER_CTX_new");
+        throw std::runtime_error("EVP_CIPHER_CTX_new");
     }
 
     int ret = 0;
@@ -246,7 +246,7 @@ bool AESGCM::decrypt(const ByteVector_t& data_in, ByteVector_t& data_out)
     if (ret == 0)
     {
         EVP_CIPHER_CTX_free(cipher);
-        std::runtime_error("EVP_EncryptInit");
+        throw std::runtime_error("EVP_EncryptInit");
     }
 
     if ((EVP_DecryptUpdate(cipher, data_out.data(), &size, &data_in.data()[HEADER_SIZE], data_in.size() - HEADER_SIZE) == 0)
@@ -254,7 +254,7 @@ bool AESGCM::decrypt(const ByteVector_t& data_in, ByteVector_t& data_out)
         || (EVP_DecryptFinal(cipher, &data_out.data()[size], &finalSize) == 0))
     {
         EVP_CIPHER_CTX_free(cipher);
-        std::runtime_error("EVP_DecryptUpdate or EVP_DecryptFinal or EVP_CIPHER_CTX_ctrl");
+        throw std::runtime_error("Failed decryption");
     }
 
     EVP_CIPHER_CTX_free(cipher);

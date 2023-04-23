@@ -2,7 +2,7 @@ project(manager_services)
 
 add_library(idservice-static
     STATIC
-        saltidservice.cpp
+        idservice.cpp
 )
 
 target_include_directories(idservice-static

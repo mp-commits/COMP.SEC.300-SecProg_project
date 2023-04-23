@@ -42,3 +42,48 @@ cmake ..
 ## Known Issues
 
 - Clipboard library was not confirmed to work on Pop-OS: Copy command may not work.
+
+## Supported commands:
+```
+add, a : Add a password to the manager. Usage:
+    add
+
+copy, c : Copy a password to clipboard. Usage:
+    copy [idx]
+
+save, s : Save passwords to an encrypted file. Usage:
+    save
+    save [password]
+    save [file] [password]
+
+exit, x : Exit the program. Usage:
+    exit
+
+export, e : Export passwords to a csv file. Usage:
+    export
+    export [file]
+
+import, i : Import passwords from a csv file. Usage:
+    import
+    import [file]
+
+load, l : Load passwords from an encrypted file. Usage:
+    load
+    load [password]
+    load [file] [password]
+
+remove, r : Removes password with a specific index. Usage:
+    remove [idx]
+
+view, v : View existing passwords. Usage:
+    view
+    view [page]
+    view [idx from] [idx to]
+
+find, f : Find a passwords by string. Usage:
+    find [search key]
+
+help, h : Display help. Usage:
+    help
+    help [cmd]
+```
