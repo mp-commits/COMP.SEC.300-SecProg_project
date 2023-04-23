@@ -149,7 +149,7 @@ bool CryptFile::Load(std::ifstream& file, std::vector<passwords::Login_t>& login
 bool CryptFile::Save(std::ofstream& file, const std::vector<passwords::Login_t>& logins, std::string& errorString)
 {
     if (!logins.empty())
-    {   
+    {
         file.seekp(std::ios_base::beg);
         
         value jv;

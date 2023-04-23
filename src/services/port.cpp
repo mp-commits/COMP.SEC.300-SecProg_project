@@ -103,39 +103,47 @@ static void ImportFromFile(ifstream& file, passwords::PasswordManager& manager)
 
     while (getline(file, line))
     {
-        const StringVector_t tokens = Tokenize(line);
-        
-        if (firstLine)
+        try
         {
-            keys = GenerateKeys(tokens);
-            firstLine = false;
-
-            bool allKeysOk = KeyExists(keys, KEY_STR_URL) && KeyExists(keys, KEY_STR_USERNAME) && KeyExists(keys, KEY_STR_PASSWORD);
-            if (!allKeysOk)
-            {
-                cout << ERR_STR_FILE << endl;
-                return;
-            }
-        }
-        else
-        {
-            const size_t idxUrl = keys[KEY_STR_URL], idxUsername = keys[KEY_STR_USERNAME], idxPassword = keys[KEY_STR_PASSWORD];
-            const size_t maxIdx = Max3(idxUrl, idxPassword, idxUsername);
+            const StringVector_t tokens = Tokenize(line);
             
-            if (tokens.size() > maxIdx)
+            if (firstLine)
             {
-                Login_t login;
-                login.username = tokens[idxUsername];
-                login.url = tokens[idxUrl];
-                login.password = tokens[idxPassword];
+                keys = GenerateKeys(tokens);
+                firstLine = false;
 
-                processed++;
-                manager.AddLogin(login) ? accepted++ : failed++;
+                bool allKeysOk = KeyExists(keys, KEY_STR_URL) && KeyExists(keys, KEY_STR_USERNAME) && KeyExists(keys, KEY_STR_PASSWORD);
+                if (!allKeysOk)
+                {
+                    cout << ERR_STR_FILE << endl;
+                    return;
+                }
             }
             else
             {
-                cout << "INVALID LINE: " << line << endl;
+                const size_t idxUrl = keys[KEY_STR_URL], idxUsername = keys[KEY_STR_USERNAME], idxPassword = keys[KEY_STR_PASSWORD];
+                const size_t maxIdx = Max3(idxUrl, idxPassword, idxUsername);
+                
+                if (tokens.size() > maxIdx)
+                {
+                    Login_t login;
+                    login.username = tokens[idxUsername];
+                    login.url = tokens[idxUrl];
+                    login.password = tokens[idxPassword];
+
+                    processed++;
+                    manager.AddLogin(login) ? accepted++ : failed++;
+                }
+                else
+                {
+                    std::runtime_error("invalid line");
+                }
             }
+        }
+        catch(...)
+        {
+            failed++;
+            cout << "INVALID LINE: " << line << endl;
         }
     }
 
@@ -144,7 +152,7 @@ static void ImportFromFile(ifstream& file, passwords::PasswordManager& manager)
         manager.SetDataSaved(false);
     }
 
-    cout << "Parsed " << processed << " logins, " << accepted << " imported, " << failed << " duplicates." << endl;
+    cout << "Parsed " << processed << " logins, " << accepted << " imported, " << failed << " rejected." << endl;
 }
 
 static void ExportToFile(ofstream& file, passwords::PasswordManager& manager)
@@ -182,10 +190,19 @@ extern void SERVICES_RunImportPasswords(passwords::PasswordManager& manager, Str
     if (!file.good())
     {
         std::cout << ERR_STR_FILE_OPEN(filename) << ": " << std::strerror(errno) << std::endl;
-        return;
+    }
+    else
+    {
+        try
+        {
+            ImportFromFile(file, manager);
+        }
+        catch(...)
+        {
+            std::cout << ERR_STR_GENERIC << std::endl;
+        }
     }
 
-    ImportFromFile(file, manager);
     file.close();
 }
 
@@ -214,13 +231,19 @@ extern void SERVICES_RunExportPasswords(passwords::PasswordManager& manager, Str
     if (!file.good())
     {
         std::cout << ERR_STR_FILE_OPEN(filename) << "': " << std::strerror(errno) << std::endl;
-        file.close();
-        return;
     }
-
-    cout << PROMPT_STR_WRITING_FILE(filename) << std::endl;
-
-    ExportToFile(file, manager);
+    else
+    {
+        try
+        {
+            cout << PROMPT_STR_WRITING_FILE(filename) << std::endl;
+            ExportToFile(file, manager);
+        }
+        catch(...)
+        {
+            std::cout << ERR_STR_GENERIC << std::endl;
+        }
+    }
 
     file.close();
 }

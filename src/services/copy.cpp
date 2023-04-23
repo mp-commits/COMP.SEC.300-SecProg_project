@@ -45,7 +45,7 @@ void SERVICES_RunCopyPassword(passwords::PasswordManager& manager, StringVector_
         }
         catch (...)
         {
-            cout << ERR_STR_GERENIC << endl;
+            cout << ERR_STR_GENERIC << endl;
         }
     }
     else

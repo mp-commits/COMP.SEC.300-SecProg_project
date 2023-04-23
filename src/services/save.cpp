@@ -114,20 +114,30 @@ void SERVICES_RunSavePasswords(passwords::PasswordManager& manager, StringVector
     {
         std::ofstream outputFile(filename, std::ios_base::trunc | std::ios_base::out | std::ios_base::binary);
 
-        if (outputFile.good())
+        try
         {
-            string errStr;
-            std::cout << PROMPT_STR_WRITING_FILE(filename) << std::endl;
-            CryptFile crypt(password);
-            crypt.Save(outputFile, manager.GetLoginVector(), errStr);
-            outputFile.close();
+            if (outputFile.good())
+            {
+                string errStr;
+                std::cout << PROMPT_STR_WRITING_FILE(filename) << std::endl;
+                CryptFile crypt(password);
 
-            manager.SetDataSaved(true);
+                if (crypt.Save(outputFile, manager.GetLoginVector(), errStr))
+                {
+                    manager.SetDataSaved(true);
+                }
+            }
+            else
+            {
+                std::cout << ERR_STR_FILE_OPEN(filename) << std::strerror(errno) << std::endl;
+            }
         }
-        else
+        catch(...)
         {
-            std::cout << ERR_STR_FILE_OPEN(filename) << std::strerror(errno) << std::endl;
+            std::cout << ERR_STR_GENERIC << std::endl;
         }
+
+        outputFile.close();
     }
     else
     {

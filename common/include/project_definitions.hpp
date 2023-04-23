@@ -22,7 +22,7 @@
 #define PROJECT_ID_HEADER_SIZE  (32U)    // Bytes
 #define PROJECT_SALT_SIZE       (32U)    // Bytes
 
-#define ERR_STR_GERENIC     "Something went wrong!"
+#define ERR_STR_GENERIC     "Something went wrong!"
 #define ERR_STR_ARG         "Invalid argument!"
 #define ERR_STR_CMD         "Invalid command!"
 #define ERR_STR_IDX         "Invalid index!"

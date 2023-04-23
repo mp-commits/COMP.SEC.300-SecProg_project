@@ -53,17 +53,17 @@ template<size_t N>
 void DeriveKey(std::array<uint8_t, N>& derived, std::string& pw, ByteVector_t& salt)
 {
     EVP_KDF *kdf;
-    EVP_KDF_CTX *kctx = NULL;
+    EVP_KDF_CTX *kctx = nullptr;
     OSSL_PARAM params[5], *p = params;
 
     /* Find and allocate a context for the HKDF algorithm */
-    if ((kdf = EVP_KDF_fetch(NULL, "hkdf", NULL)) == NULL) {
+    if ((kdf = EVP_KDF_fetch(nullptr, "hkdf", nullptr)) == nullptr) {
         std::runtime_error("EVP_KDF_fetch");
     }
 
     kctx = EVP_KDF_CTX_new(kdf);
     EVP_KDF_free(kdf);    /* The kctx keeps a reference so this is safe */
-    if (kctx == NULL) {
+    if (kctx == nullptr) {
         std::runtime_error("EVP_KDF_CTX_new");
     }
 
@@ -78,11 +78,13 @@ void DeriveKey(std::array<uint8_t, N>& derived, std::string& pw, ByteVector_t& s
     *p = OSSL_PARAM_construct_end();
 
     if (EVP_KDF_CTX_set_params(kctx, params) <= 0) {
+        EVP_KDF_CTX_free(kctx);
         std::runtime_error("EVP_KDF_CTX_set_params");
     }
 
     /* Do the derivation */
-    if (EVP_KDF_derive(kctx, derived.data(), derived.size(), NULL) <= 0) {
+    if (EVP_KDF_derive(kctx, derived.data(), derived.size(), nullptr) <= 0) {
+        EVP_KDF_CTX_free(kctx);
         std::runtime_error("EVP_KDF_derive");
     }
 
@@ -146,7 +148,11 @@ bool AESGCM::encrypt(const ByteVector_t& data_in, ByteVector_t& data_out)
     uint8_t tag[TAG_SIZE];
     uint8_t iv[IV_SIZE];
 
-    RAND_bytes(iv, sizeof(iv));
+    if (RAND_bytes(iv, sizeof(iv)) == 0)
+    {
+        std::runtime_error("RAND_bytes");
+    }
+
     std::copy(iv, iv+IV_SIZE, data_out.begin()+IV_SIZE);
 
     int size = 0;
@@ -154,22 +160,39 @@ bool AESGCM::encrypt(const ByteVector_t& data_in, ByteVector_t& data_out)
 
     EVP_CIPHER_CTX* cipher = EVP_CIPHER_CTX_new();
 
+    if (cipher == nullptr)
+    {
+        std::runtime_error("EVP_CIPHER_CTX_new");
+    }
+
+    int ret = 0;
+
     if (m_keyType == KEY_TYPE_128)
     {
-        EVP_EncryptInit(cipher, EVP_aes_128_gcm(), m_key.k128.data(), iv);
+        ret = EVP_EncryptInit(cipher, EVP_aes_128_gcm(), m_key.k128.data(), iv);
     }
     else if (m_keyType == KEY_TYPE_192)
     {
-        EVP_EncryptInit(cipher, EVP_aes_192_gcm(), m_key.k192.data(), iv);
+        ret = EVP_EncryptInit(cipher, EVP_aes_192_gcm(), m_key.k192.data(), iv);
     }
     else
     {
-        EVP_EncryptInit(cipher, EVP_aes_256_gcm(), m_key.k256.data(), iv);
+        ret = EVP_EncryptInit(cipher, EVP_aes_256_gcm(), m_key.k256.data(), iv);
     }
 
-    EVP_EncryptUpdate(cipher, &data_out.data()[HEADER_SIZE], &size, data_in.data(), data_in.size());
-    EVP_EncryptFinal(cipher, &data_out.data()[HEADER_SIZE+size], &finalSize);
-    EVP_CIPHER_CTX_ctrl(cipher, EVP_CTRL_GCM_GET_TAG, 16, tag);
+    if (ret == 0)
+    {
+        EVP_CIPHER_CTX_free(cipher);
+        std::runtime_error("EVP_EncryptInit");
+    }
+
+    if ((EVP_EncryptUpdate(cipher, &data_out.data()[HEADER_SIZE], &size, data_in.data(), data_in.size()) == 0)
+        || (EVP_EncryptFinal(cipher, &data_out.data()[HEADER_SIZE+size], &finalSize) == 0)
+        || (EVP_CIPHER_CTX_ctrl(cipher, EVP_CTRL_GCM_GET_TAG, 16, tag) == 0))
+    {
+        EVP_CIPHER_CTX_free(cipher);
+        std::runtime_error("EVP_EncryptUpdate or EVP_EncryptFinal or EVP_CIPHER_CTX_ctrl");
+    }
 
     std::copy(tag, tag+TAG_SIZE, data_out.begin());
     std::copy(iv, iv+IV_SIZE, data_out.begin()+IV_SIZE);
@@ -200,22 +223,40 @@ bool AESGCM::decrypt(const ByteVector_t& data_in, ByteVector_t& data_out)
 
     EVP_CIPHER_CTX* cipher = EVP_CIPHER_CTX_new();
 
+    if (cipher == nullptr)
+    {
+        std::runtime_error("EVP_CIPHER_CTX_new");
+    }
+
+    int ret = 0;
+
     if (m_keyType == KEY_TYPE_128)
     {
-        EVP_DecryptInit(cipher, EVP_aes_128_gcm(), m_key.k128.data(), iv);
+        ret = EVP_DecryptInit(cipher, EVP_aes_128_gcm(), m_key.k128.data(), iv);
     }
     else if (m_keyType == KEY_TYPE_192)
     {
-        EVP_DecryptInit(cipher, EVP_aes_192_gcm(), m_key.k128.data(), iv);
+        ret = EVP_DecryptInit(cipher, EVP_aes_192_gcm(), m_key.k128.data(), iv);
     }
     else
     {
-        EVP_DecryptInit(cipher, EVP_aes_256_gcm(), m_key.k256.data(), iv);
+        ret = EVP_DecryptInit(cipher, EVP_aes_256_gcm(), m_key.k256.data(), iv);
     }
 
-    EVP_DecryptUpdate(cipher, data_out.data(), &size, &data_in.data()[HEADER_SIZE], data_in.size() - HEADER_SIZE);
-    EVP_CIPHER_CTX_ctrl(cipher, EVP_CTRL_GCM_SET_TAG, 16, tag);
-    EVP_DecryptFinal(cipher, &data_out.data()[size], &finalSize);
+    if (ret == 0)
+    {
+        EVP_CIPHER_CTX_free(cipher);
+        std::runtime_error("EVP_EncryptInit");
+    }
+
+    if ((EVP_DecryptUpdate(cipher, data_out.data(), &size, &data_in.data()[HEADER_SIZE], data_in.size() - HEADER_SIZE) == 0)
+        || (EVP_CIPHER_CTX_ctrl(cipher, EVP_CTRL_GCM_SET_TAG, 16, tag) == 0)
+        || (EVP_DecryptFinal(cipher, &data_out.data()[size], &finalSize) == 0))
+    {
+        EVP_CIPHER_CTX_free(cipher);
+        std::runtime_error("EVP_DecryptUpdate or EVP_DecryptFinal or EVP_CIPHER_CTX_ctrl");
+    }
+
     EVP_CIPHER_CTX_free(cipher);
 
     data_out.resize(size + finalSize, 0x00);

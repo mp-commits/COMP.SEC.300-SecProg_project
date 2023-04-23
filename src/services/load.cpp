@@ -37,7 +37,7 @@ static void RunAddLogins(const vector<Login_t>& logins, PasswordManager& manager
         manager.AddLogin(l) ? ok++ : fail++;
     }
 
-    cout << "Parsed " << logins.size() << " logins, " << ok << " added, " << fail << " duplicates." << endl;
+    cout << "Parsed " << logins.size() << " logins, " << ok << " added, " << fail << " rejected." << endl;
 }
 
 void SERVICES_RunLoadPasswords(passwords::PasswordManager& manager, StringVector_t args)
@@ -71,20 +71,28 @@ void SERVICES_RunLoadPasswords(passwords::PasswordManager& manager, StringVector
 
     if (inputFile.good())
     {
-        string errStr;
-        CryptFile crypt(password);
-        std::vector<passwords::Login_t> logins;
-
-        if(!crypt.Load(inputFile, logins, errStr))
+        try
         {
-            std::cout << errStr << std::endl;
-        }
+            string errStr;
+            CryptFile crypt(password);
+            std::vector<passwords::Login_t> logins;
 
-        inputFile.close();
-        RunAddLogins(logins, manager);
+            if(!crypt.Load(inputFile, logins, errStr))
+            {
+                std::cout << errStr << std::endl;
+            }
+
+            RunAddLogins(logins, manager);
+        }
+        catch(...)
+        {
+            std::cout << ERR_STR_GENERIC << std::endl;
+        }
     }
     else
     {
         std::cout << ERR_STR_FILE_OPEN(filename) << "': " << std::strerror(errno) << std::endl;
     }
+
+    inputFile.close();
 }
