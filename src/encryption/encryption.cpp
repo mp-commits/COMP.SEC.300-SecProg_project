@@ -36,7 +36,16 @@ static void InitSSL()
     if (!f_ssl_init_done)
     {
         OpenSSL_add_all_ciphers();
-        (void)RAND_load_file("/dev/urandom", 32);
+
+#ifdef _WIN32
+
+#elif __linux__
+        if (RAND_load_file("/dev/urandom", 32) == 0)
+        {
+            throw std::runtime_error("Failed to set PRNG seed from /dev/urandom");
+        }
+#endif
+
         f_ssl_init_done = true;
     }
 }
