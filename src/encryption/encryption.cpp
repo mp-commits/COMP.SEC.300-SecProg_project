@@ -21,6 +21,14 @@
 
 #include <sstream>
 
+#ifdef _WIN32
+#include <windows.h>
+HCRYPTPROV hCryptProv = 0;
+LPCSTR UserName = "PasswordManagerKeyContainer";
+#endif
+
+#define CRYPTO_SEED_SIZE (32)
+
 using namespace encryption;
 using namespace encryptionUtil;
 
@@ -39,11 +47,47 @@ static void InitSSL()
 
 #ifdef _WIN32
 
+        if(!CryptAcquireContext(&hCryptProv, UserName, NULL, PROV_RSA_FULL, 0))
+        {
+            if (GetLastError() == NTE_BAD_KEYSET)
+            {
+                if (!CryptAcquireContext(&hCryptProv, UserName, NULL, PROV_RSA_FULL, CRYPT_NEWKEYSET))
+                {
+                    DWORD err = GetLastError();
+                    std::string errStr = "Failed to set HCRYPTPROV seed with CryptAcquireContext: " + std::to_string(err);
+                    throw std::runtime_error(errStr);
+                }
+            }
+            else
+            {
+                DWORD err = GetLastError();
+                std::string errStr = "Failed to set HCRYPTPROV seed with CryptAcquireContext: " + std::to_string(err);
+                throw std::runtime_error(errStr);
+            }
+        }
+
+        BYTE seed[CRYPTO_SEED_SIZE];
+
+        if (CryptGenRandom(hCryptProv, CRYPTO_SEED_SIZE, seed))
+        {
+            RAND_seed(seed, sizeof(seed));
+            CryptReleaseContext(hCryptProv,0);
+        }
+        else
+        {
+            CryptReleaseContext(hCryptProv,0);
+            DWORD err = GetLastError();
+            std::string errStr = "Failed to set PRNG seed from CryptGenRandom: " + std::to_string(err);
+            throw std::runtime_error(errStr);
+        }
+
 #elif __linux__
-        if (RAND_load_file("/dev/urandom", 32) == 0)
+
+        if (RAND_load_file("/dev/urandom", CRYPTO_SEED_SIZE) == 0)
         {
             throw std::runtime_error("Failed to set PRNG seed from /dev/urandom");
         }
+
 #endif
 
         f_ssl_init_done = true;
