@@ -149,27 +149,20 @@ EVPKDF::EVPKDF(const std::string& pw, const ByteVector_t& salt) : m_pw(pw), m_sa
     InitSSL();
 }
 
-ENCRYPTION_Key128_t EVPKDF::derive128()
+void EVPKDF::derive128(ENCRYPTION_Key128_t& key)
 {
-    ENCRYPTION_Key128_t key;
-    DeriveKey<key.size()>(key, m_pw, m_salt);
-    return key;
+    DeriveKey(key, m_pw, m_salt);
 }
 
-ENCRYPTION_Key192_t EVPKDF::derive192()
+void EVPKDF::derive192(ENCRYPTION_Key192_t& key)
 {
-    ENCRYPTION_Key192_t key;
-    DeriveKey<key.size()>(key, m_pw, m_salt);
-    return key;
+    DeriveKey(key, m_pw, m_salt);
 }
 
-ENCRYPTION_Key256_t EVPKDF::derive256()
+void EVPKDF::derive256(ENCRYPTION_Key256_t& key)
 {
-    ENCRYPTION_Key256_t key;
-    DeriveKey<key.size()>(key, m_pw, m_salt);
-    return key;
+    DeriveKey(key, m_pw, m_salt);
 }
-
 
 AESGCM::AESGCM(const ENCRYPTION_Key128_t& key) : m_keyType(KEY_TYPE_128), m_key(key)
 {
@@ -307,7 +300,7 @@ bool AESGCM::decrypt(const ByteVector_t& data_in, ByteVector_t& data_out)
         || (EVP_DecryptFinal(cipher, &data_out.data()[size], &finalSize) == 0))
     {
         EVP_CIPHER_CTX_free(cipher);
-        throw std::runtime_error("Failed decryption");
+        return false;
     }
 
     EVP_CIPHER_CTX_free(cipher);

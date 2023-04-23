@@ -121,8 +121,9 @@ bool CryptFile::Load(std::ifstream& file, std::vector<passwords::Login_t>& login
 
     IDSERVICE_AddId(salt);
 
-    EVPKDF der(m_password, salt);
-    ENCRYPTION_Key256_t key = der.derive256();
+    ENCRYPTION_Key256_t key;
+    EVPKDF kdf(m_password, salt);
+    kdf.derive256(key);
 
     AESGCM aes(key);
 
@@ -163,9 +164,11 @@ bool CryptFile::Save(std::ofstream& file, const std::vector<passwords::Login_t>&
 
         IDSERVICE_AddId(salt);
 
-        EVPKDF der(m_password, salt);
+        EVPKDF kdf(m_password, salt);
 
-        ENCRYPTION_Key256_t key = der.derive256();
+        ENCRYPTION_Key256_t key;
+        kdf.derive256(key);
+
         AESGCM aes(key);
 
         ByteVector_t cryptData;

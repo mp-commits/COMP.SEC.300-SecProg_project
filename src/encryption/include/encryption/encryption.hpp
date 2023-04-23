@@ -31,9 +31,9 @@ class EVPKDF
 public:
     EVPKDF(const std::string& pw, const ByteVector_t& salt);
 
-    ENCRYPTION_Key128_t derive128();
-    ENCRYPTION_Key192_t derive192();
-    ENCRYPTION_Key256_t derive256();
+    void derive128(ENCRYPTION_Key128_t& key);
+    void derive192(ENCRYPTION_Key192_t& key);
+    void derive256(ENCRYPTION_Key256_t& key);
 
 private:
     std::string m_pw;

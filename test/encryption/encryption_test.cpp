@@ -43,9 +43,12 @@ TEST(TEST_SUITE_NAME, deriveKey)
     EVPKDF der2(password, salt);
     EVPKDF der3(password, salt2);
 
-    ENCRYPTION_Key128_t key = der.derive128();
-    ENCRYPTION_Key128_t key2 = der2.derive128();
-    ENCRYPTION_Key128_t key3 = der3.derive128();
+    ENCRYPTION_Key128_t key;
+    der.derive128(key);
+    ENCRYPTION_Key128_t key2;
+    der2.derive128(key2);
+    ENCRYPTION_Key128_t key3;
+    der3.derive128(key3);
 
     EXPECT_EQ(key, key2);
     EXPECT_NE(key, key3);
@@ -168,7 +171,7 @@ TEST(TEST_SUITE_NAME, aes128WrongKey)
     EXPECT_NE(testData, encryptedData);
 
     ByteVector_t plainData;
-    EXPECT_TRUE(decrypter.decrypt(encryptedData, plainData));
+    EXPECT_FALSE(decrypter.decrypt(encryptedData, plainData));
     EXPECT_NE(testData, plainData);
 
     EXPECT_TRUE(encrypter.decrypt(encryptedData, plainData));
@@ -276,7 +279,7 @@ TEST(TEST_SUITE_NAME, aes256WrongKey)
     EXPECT_NE(testData, encryptedData);
 
     ByteVector_t plainData;
-    EXPECT_TRUE(decrypter.decrypt(encryptedData, plainData));
+    EXPECT_FALSE(decrypter.decrypt(encryptedData, plainData));
     EXPECT_NE(testData, plainData);
 
     EXPECT_TRUE(encrypter.decrypt(encryptedData, plainData));
@@ -384,7 +387,7 @@ TEST(TEST_SUITE_NAME, aes192WrongKey)
     EXPECT_NE(testData, encryptedData);
 
     ByteVector_t plainData;
-    EXPECT_TRUE(decrypter.decrypt(encryptedData, plainData));
+    EXPECT_FALSE(decrypter.decrypt(encryptedData, plainData));
     EXPECT_NE(testData, plainData);
 
     EXPECT_TRUE(encrypter.decrypt(encryptedData, plainData));
