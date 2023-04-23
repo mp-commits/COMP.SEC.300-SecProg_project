@@ -25,8 +25,8 @@ public:
     CryptFile(const std::string& password);
     ~CryptFile();
 
-    bool Load(std::ifstream& file, std::vector<passwords::Login_t>& logins, std::string& errorString);
-    bool Save(std::ofstream& file, const std::vector<passwords::Login_t>& logins, std::string& errorString);
+    bool Load(std::ifstream& file, std::vector<passwords::Login_t>& logins);
+    bool Save(std::ofstream& file, const std::vector<passwords::Login_t>& logins);
 
 private:
     std::string         m_password;

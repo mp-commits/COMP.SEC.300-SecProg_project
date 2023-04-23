@@ -90,7 +90,7 @@ CryptFile::~CryptFile()
 
 }
 
-bool CryptFile::Load(std::ifstream& file, std::vector<passwords::Login_t>& logins, std::string& errorString)
+bool CryptFile::Load(std::ifstream& file, std::vector<passwords::Login_t>& logins)
 {
     file.seekg(0, std::ios_base::end);
     size_t fileSize = file.tellg();
@@ -98,7 +98,7 @@ bool CryptFile::Load(std::ifstream& file, std::vector<passwords::Login_t>& login
 
     if (fileSize <= PROJECT_SALT_SIZE + PROJECT_ID_HEADER_SIZE)
     {
-        errorString += ERR_STR_FILE;
+        throw std::runtime_error(ERR_STR_FILE);
         return false;
     }
     
@@ -113,8 +113,7 @@ bool CryptFile::Load(std::ifstream& file, std::vector<passwords::Login_t>& login
 
     if (!IDSERVICE_IsApplicationHeader(header))
     {
-        errorString += ERROR_STR_INCOMPATIBLE_FILE;
-        return false;
+        throw std::runtime_error(ERROR_STR_INCOMPATIBLE_FILE);
     }
 
     file.read((char*)salt.data(), PROJECT_SALT_SIZE);
@@ -129,13 +128,11 @@ bool CryptFile::Load(std::ifstream& file, std::vector<passwords::Login_t>& login
 
     if (!aes.decrypt(cryptData, plainData))
     {
-        errorString += ERR_STR_DECRYPT;
-        return false;
+        throw std::runtime_error(ERR_STR_DECRYPT);
     }
     if (!VerifyChecksum(plainData))
     {
-        errorString += ERR_STR_CHECKSUM;
-        return false;
+        throw std::runtime_error(ERR_STR_CHECKSUM);
     }
     
     std::string s = vectorToString(plainData);
@@ -146,7 +143,7 @@ bool CryptFile::Load(std::ifstream& file, std::vector<passwords::Login_t>& login
     return true;
 }
 
-bool CryptFile::Save(std::ofstream& file, const std::vector<passwords::Login_t>& logins, std::string& errorString)
+bool CryptFile::Save(std::ofstream& file, const std::vector<passwords::Login_t>& logins)
 {
     if (!logins.empty())
     {

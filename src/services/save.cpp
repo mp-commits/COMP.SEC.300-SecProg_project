@@ -118,11 +118,10 @@ void SERVICES_RunSavePasswords(passwords::PasswordManager& manager, StringVector
         {
             if (outputFile.good())
             {
-                string errStr;
                 std::cout << PROMPT_STR_WRITING_FILE(filename) << std::endl;
                 CryptFile crypt(password);
 
-                if (crypt.Save(outputFile, manager.GetLoginVector(), errStr))
+                if (crypt.Save(outputFile, manager.GetLoginVector()))
                 {
                     manager.SetDataSaved(true);
                 }
@@ -132,9 +131,13 @@ void SERVICES_RunSavePasswords(passwords::PasswordManager& manager, StringVector
                 std::cout << ERR_STR_FILE_OPEN(filename) << std::strerror(errno) << std::endl;
             }
         }
+        catch(std::exception& ex)
+        {
+            std::cout << ex.what() << std::endl;
+        }
         catch(...)
         {
-            std::cout << ERR_STR_GENERIC << std::endl;
+            std::cout << current_exception().__cxa_exception_type()->name() << std::endl;
         }
 
         outputFile.close();

@@ -136,14 +136,19 @@ static void ImportFromFile(ifstream& file, passwords::PasswordManager& manager)
                 }
                 else
                 {
-                    throw std::runtime_error("invalid line");
+                    throw std::runtime_error("Ignored invalid line in the file");
                 }
             }
+        }
+        catch(std::exception& ex)
+        {
+            failed++;
+            std::cout << ex.what() << std::endl;
         }
         catch(...)
         {
             failed++;
-            cout << "INVALID LINE: " << line << endl;
+            std::cout << current_exception().__cxa_exception_type()->name() << std::endl;
         }
     }
 
@@ -197,9 +202,13 @@ extern void SERVICES_RunImportPasswords(passwords::PasswordManager& manager, Str
         {
             ImportFromFile(file, manager);
         }
+        catch(std::exception& ex)
+        {
+            std::cout << ex.what() << std::endl;
+        }
         catch(...)
         {
-            std::cout << ERR_STR_GENERIC << std::endl;
+            std::cout << current_exception().__cxa_exception_type()->name() << std::endl;
         }
     }
 
@@ -238,6 +247,10 @@ extern void SERVICES_RunExportPasswords(passwords::PasswordManager& manager, Str
         {
             cout << PROMPT_STR_WRITING_FILE(filename) << std::endl;
             ExportToFile(file, manager);
+        }
+        catch(std::exception& ex)
+        {
+            std::cout << ex.what() << std::endl;
         }
         catch(...)
         {

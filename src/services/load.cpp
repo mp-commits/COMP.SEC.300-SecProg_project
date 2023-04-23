@@ -73,20 +73,23 @@ void SERVICES_RunLoadPasswords(passwords::PasswordManager& manager, StringVector
     {
         try
         {
-            string errStr;
             CryptFile crypt(password);
             std::vector<passwords::Login_t> logins;
 
-            if(!crypt.Load(inputFile, logins, errStr))
+            if(!crypt.Load(inputFile, logins))
             {
-                std::cout << errStr << std::endl;
+                throw runtime_error("Failed decryption");
             }
 
             RunAddLogins(logins, manager);
         }
+        catch(std::exception& ex)
+        {
+            std::cout << ex.what() << std::endl;
+        }
         catch(...)
         {
-            std::cout << ERR_STR_GENERIC << std::endl;
+            std::cout << current_exception().__cxa_exception_type()->name() << std::endl;
         }
     }
     else
