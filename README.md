@@ -6,6 +6,7 @@ Project work for the course COMP.SEC.300-2022-2023-1 Secure Programming
 - CMake 3.11 or newer. Tested with version 3.20
 - Ninja build
 - OpenSSL 3.0. Tested with 3.0.4 (Linux) and 3.0.8 (Windows). See build istructions.
+- Git installed such that git is available command in PATH.
 - Internet connection. CMake needs to fetch libraries from GitHub.
 
 ## Building on Ubuntu/Pop-OS
