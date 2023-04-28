@@ -9,6 +9,9 @@
  * 
  */
 
+#ifndef CSV_FILE_HPP
+#define CSV_FILE_HPP
+
 #include <fstream>
 #include "passwords/passwords.hpp"
 
@@ -19,3 +22,5 @@ extern bool CSV_GetLoginsFromFile(std::ifstream& file, std::vector<passwords::Lo
 extern bool CSV_SetLoginsToFile(std::ofstream& file, const std::vector<passwords::Login_t>& logins);
 
 } // namespace csv
+
+#endif // CSV_FILE_HPP

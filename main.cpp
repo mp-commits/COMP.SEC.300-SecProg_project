@@ -15,16 +15,45 @@
 #include "cli/cli.hpp"
 #include "passwords/passwords.hpp"
 #include "stringvector.hpp"
+#include "version.hpp"
+
+#define ARGUMENT_VERSION "--version"
 
 using std::string;
 using passwords::PasswordManager;
 
 static PasswordManager f_manager;
 
+extern "C"
+{
+    extern const char* GIT_TAG;
+    extern const char* GIT_REV;
+    extern const char* GIT_BRANCH;
+}
+
 void ExitSignalHandler( int signum )
 {
     std::cout << "Exiting..." << std::endl;
     exit(signum);  
+}
+
+void DisplayVersion(void)
+{
+    string tag(GIT_TAG);
+
+    if (tag.empty())
+    {
+        std::cout << "Password manager: " << "development build: " << __DATE__ << " " << __TIME__ << std::endl; 
+    }
+    else
+    {
+        std::cout << "Manager: " << "release " << GIT_TAG << std::endl; 
+    }
+
+    std::cout << "Version: " << VERSION_NUMBER_MAJOR << 
+                    "." << VERSION_NUMBER_MINOR << 
+                    " " << GIT_BRANCH << "-" << GIT_REV <<
+                    " " << VERSION_NAME_STR << std::endl;
 }
 
 int main(int argc, char* argv[])
@@ -38,8 +67,16 @@ int main(int argc, char* argv[])
         {
             args.push_back(std::string(argv[i]));
         }
-        
-        CLI_RunCli(f_manager, args);
+
+        if (!args.empty() && ((args[0] == ARGUMENT_VERSION)))
+        {
+            DisplayVersion();
+        }
+        else
+        {
+            CLI_RunCli(f_manager, args);
+        }
+
         return 0;
     }
     catch (...)

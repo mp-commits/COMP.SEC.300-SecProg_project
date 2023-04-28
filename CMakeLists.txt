@@ -20,10 +20,16 @@ if (ENABLE_EXAMPLES)
     file(COPY ${SOURCE_DIR} DESTINATION ${DEST_DIR})
 endif()
 
+add_custom_command(
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/git_version.cpp
+           ${CMAKE_CURRENT_BINARY_DIR}/_git_version.cpp
+    COMMAND ${CMAKE_COMMAND} -P
+            ${CMAKE_CURRENT_SOURCE_DIR}/cmake/git_version.cmake)
+
 add_subdirectory(src)
 add_subdirectory(test)
 
-add_executable(${EXECUTABLE_NAME} main.cpp)
+add_executable(${EXECUTABLE_NAME} main.cpp ${CMAKE_CURRENT_BINARY_DIR}/git_version.cpp)
 
 target_link_libraries(${EXECUTABLE_NAME} 
     PRIVATE 

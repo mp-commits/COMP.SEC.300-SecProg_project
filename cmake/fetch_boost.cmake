@@ -1,7 +1,7 @@
 message(STATUS "Fetching boost. DO NOT PANIC! This will take some time (even 10+ minutes)!")
 include(FetchContent)
 
-set(BOOST_INCLUDE_LIBRARIES json tokenizer)
+set(BOOST_INCLUDE_LIBRARIES tokenizer)
 set(BOOST_ENABLE_CMAKE ON)
 
 include(FetchContent)
