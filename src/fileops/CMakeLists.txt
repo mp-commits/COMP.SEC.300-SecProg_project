@@ -2,7 +2,7 @@ project(fileops)
 
 add_library(${PROJECT_NAME}-static 
     STATIC 
-        cryptfile.cpp 
+        fileops.cpp 
 )
 
 target_include_directories(${PROJECT_NAME}-static
@@ -13,7 +13,7 @@ target_include_directories(${PROJECT_NAME}-static
 
 target_link_libraries(${PROJECT_NAME}-static 
     PUBLIC
-        Boost::json
+        Boost::tokenizer
         encryption-static
         passwords-static
         idservice-static

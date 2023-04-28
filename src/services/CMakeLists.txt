@@ -29,7 +29,6 @@ target_include_directories(${PROJECT_NAME}-static
 
 target_link_libraries(${PROJECT_NAME}-static
     PUBLIC
-        Boost::tokenizer
         decap::clip
         encryption-static
         fileops-static
