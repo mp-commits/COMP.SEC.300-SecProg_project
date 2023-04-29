@@ -125,8 +125,25 @@ static StringVector_t GetArgs(string s, string delimiter)
     {
         res.push_back(token);
     }
-    
+
     return res;
+}
+
+static void ValidateArgs(StringVector_t& vec)
+{
+    const std::string allowedCharacters = "abcdefghijklmnopqrstuvwxyzäöåABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÅ0123456789()_-,.*/\\:;";
+
+    for (auto& s: vec)
+    {
+        for (auto c: s)
+        {
+            if (allowedCharacters.find(c) == std::string::npos)
+            {
+                vec.clear();
+                return;
+            }
+        }
+    }
 }
 
 static void PrintError(string msg)
@@ -192,6 +209,7 @@ void CLI_RunCli(passwords::PasswordManager& manager, StringVector_t args)
         cout << CLI_HEADER;
         getline(cin, input);
         StringVector_t args = GetArgs(input, CLI_ARG_DELIM);
+        ValidateArgs(args);
         
         if (args.size() == 0)
         {
