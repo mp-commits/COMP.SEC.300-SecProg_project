@@ -324,7 +324,6 @@ bool csv::CSV_GetLoginsFromFile(ifstream& file, vector<passwords::Login_t>& logi
             }
             else
             {
-                cout << "Adding" << line << endl;
                 logins.push_back(CsvLineToLogin(line, keys));
                 success = true;
             }

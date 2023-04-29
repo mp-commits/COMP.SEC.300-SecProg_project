@@ -1,0 +1,4 @@
+Empty user input validation
+Manual argument removal
+Unify argument count handling: Too many args -> what?
+Passwords cannot be empty
