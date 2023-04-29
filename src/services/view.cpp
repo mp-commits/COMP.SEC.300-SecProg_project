@@ -58,22 +58,31 @@ void SERVICES_RunViewPasswords(passwords::PasswordManager& manager, StringVector
     {
         cout << "No login information loaded" << endl;
     }
-    else if (args.size() > 1U)
+    else
     {
         try {
             size_t startIdx = 0;
             size_t endIdx = 0;
 
-            if (args.size() == 2U)
+            if (args.size() == 1U)
+            {
+                startIdx = 0U;
+                endIdx = count;
+            }
+            else if (args.size() == 2U)
             {
                 size_t page = stoi(args[1]);
                 startIdx = page * DISPLAY_PAGE_SIZE;
                 endIdx = startIdx + DISPLAY_PAGE_SIZE;
             }
-            else if (args.size() > 2U)
+            else if (args.size() == 3U)
             {
                 startIdx = stoi(args[1]);
                 endIdx = stoi(args[2]) + 1U;
+            }
+            else
+            {
+                throw std::invalid_argument(ERR_STR_ARG);
             }
 
             if (startIdx < count)
@@ -90,32 +99,32 @@ void SERVICES_RunViewPasswords(passwords::PasswordManager& manager, StringVector
         }
         catch (...)
         {
-            cout << ERR_STR_ARG << ": " << args[1] << endl;
-        }
-    }
-    else
-    {
-        for (size_t i = 0; i < count; i++)
-        {
-            PrintLogin(i, manager[i]);
+            cout << ERR_STR_ARG << endl;
         }
     }
 }
 
 void SERVICES_RunFindPassword(passwords::PasswordManager& manager, StringVector_t args)
 {
-    if (args.size() == 2U)
+    try
     {
-        for (size_t i = 0; i < manager.Count(); i++)
+        if (args.size() == 2U)
         {
-            Login_t login = manager[i];
-            if (MatchToLogin(args[1], login))
+            for (size_t i = 0; i < manager.Count(); i++)
             {
-                PrintLogin(i, login);
+                Login_t login = manager[i];
+                if (MatchToLogin(args[1], login))
+                {
+                    PrintLogin(i, login);
+                }
             }
         }
+        else
+        {
+            throw std::invalid_argument(ERR_STR_ARG);
+        }
     }
-    else
+    catch (...)
     {
         cout << ERR_STR_ARG << endl;
     }

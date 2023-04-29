@@ -56,15 +56,8 @@ void SERVICES_RunLoadPasswords(passwords::PasswordManager& manager, StringVector
     }
     else
     {
-        string newFile;
-        cout << FILE_PROMPT;
-        getline(cin, newFile);
-        if (!newFile.empty())
-        {
-            filename = newFile;
-        }
-        cout << PROMPT_STR_PASSWORD;
-        getline(cin, password);
+        cout << ERR_STR_ARG << endl;
+        return;
     }
 
     std::ifstream inputFile(filename, std::ios_base::in | std::ios_base::binary);

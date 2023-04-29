@@ -53,14 +53,14 @@ extern void SERVICES_RunImportPasswords(passwords::PasswordManager& manager, Str
 {
     string filename;
     
-    if (args.size() < 2)
+    if (args.size() == 2)
     {
-        cout << PROMPT_STR_FILE_ENTRY;
-        getline(cin, filename);
+        filename = args[1];
     }
     else
     {
-        filename = args[1];
+        cout << ERR_STR_ARG << endl;
+        return;
     }
 
     ifstream file(filename, std::ios::in);
@@ -101,14 +101,14 @@ extern void SERVICES_RunExportPasswords(passwords::PasswordManager& manager, Str
 {
     string filename;
 
-    if (args.size() < 2)
+    if (args.size() == 2)
     {
-        cout << PROMPT_STR_FILE_ENTRY;
-        getline(cin, filename);
+        filename = args[1];
     }
     else
     {
-        filename = args[1];
+        cout << ERR_STR_ARG << endl;
+        return;
     }
 
     if (FileExists(filename))

@@ -98,16 +98,8 @@ void SERVICES_RunSavePasswords(passwords::PasswordManager& manager, StringVector
     }
     else
     {
-        cout << PROMPT_STR_FILE_ENTRY_DEFAULT;
-        getline(cin, filename);
-        
-        if (filename.empty())
-        {
-            filename = DEFAULT_FILE_NAME;
-        }
-
-        cout << PROMPT_STR_PASSWORD;
-        getline(cin, password);
+        cout << ERR_STR_ARG << endl;
+        return;
     }
 
     if (CheckFileCanBeWritten(filename))

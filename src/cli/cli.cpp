@@ -114,10 +114,18 @@ static StringVector_t GetArgs(string s, string delimiter)
     {
         token = s.substr(start, end - start);
         start = end + delimLength;
-        res.push_back(token);
+        if (!token.empty())
+        {
+            res.push_back(token);
+        }
     }
 
-    res.push_back(s.substr(start));
+    token = s.substr(start);
+    if (!token.empty())
+    {
+        res.push_back(token);
+    }
+    
     return res;
 }
 
