@@ -13,12 +13,10 @@
 #include "clip.h"
 #include "project_definitions.hpp"
 
-#include <iostream>
-
 using namespace passwords;
 using namespace std;
 
-void SERVICES_RunCopyPassword(passwords::PasswordManager& manager, StringVector_t args)
+void SERVICES_RunCopyPassword(passwords::PasswordManager& manager, std::ostream& output, std::istream&, StringVector_t args)
 {
     if (args.size() == 2U)
     {
@@ -31,25 +29,25 @@ void SERVICES_RunCopyPassword(passwords::PasswordManager& manager, StringVector_
                 Login_t login = manager[idx];
                 if (clip::set_text(login.password))
                 {
-                    cout << "Successfully copied: " << login.password << endl;
+                    output << "Successfully copied: " << login.password << endl;
                 }
                 else
                 {
-                    cout << "Failed to copy!" << endl;
+                    output << "Failed to copy!" << endl;
                 }
             }
             else
             {
-                cout << ERR_STR_IDX << endl;
+                output << ERR_STR_IDX << endl;
             }
         }
         catch (...)
         {
-            cout << ERR_STR_GENERIC << endl;
+            output << ERR_STR_GENERIC << endl;
         }
     }
     else
     {
-        cout << ERR_STR_ARG << endl;
+        output << ERR_STR_ARG << endl;
     }
 }

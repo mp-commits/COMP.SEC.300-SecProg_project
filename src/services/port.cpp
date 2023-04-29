@@ -16,15 +16,13 @@
 #include <algorithm>
 #include <cctype>
 #include <fstream>
-#include <iostream>
 #include <cstring>
 #include <cerrno>
-#include <map>
 
 using namespace passwords;
 using namespace std;
 
-static bool FileExists(const std::string& filename)
+static bool FileExists(const string& filename)
 {
     bool exists = false;
     ifstream file(filename);
@@ -38,7 +36,7 @@ static bool FileExists(const std::string& filename)
     return exists;
 }
 
-static void RunAddLogins(const vector<Login_t>& logins, PasswordManager& manager)
+static void RunAddLogins(const vector<Login_t>& logins, PasswordManager& manager, ostream& output)
 {
     size_t ok = 0, fail = 0;
     for (auto l: logins)
@@ -46,10 +44,10 @@ static void RunAddLogins(const vector<Login_t>& logins, PasswordManager& manager
         manager.AddLogin(l) ? ok++ : fail++;
     }
 
-    cout << "Parsed " << logins.size() << " logins, " << ok << " added, " << fail << " rejected." << endl;
+    output << "Parsed " << logins.size() << " logins, " << ok << " added, " << fail << " rejected." << endl;
 }
 
-extern void SERVICES_RunImportPasswords(passwords::PasswordManager& manager, StringVector_t args)
+extern void SERVICES_RunImportPasswords(passwords::PasswordManager& manager, ostream& output, istream& input, StringVector_t args)
 {
     string filename;
     
@@ -59,15 +57,15 @@ extern void SERVICES_RunImportPasswords(passwords::PasswordManager& manager, Str
     }
     else
     {
-        cout << ERR_STR_ARG << endl;
+        output << ERR_STR_ARG << endl;
         return;
     }
 
-    ifstream file(filename, std::ios::in);
+    ifstream file(filename, ios::in);
     
     if (!file.good())
     {
-        std::cout << ERR_STR_FILE_OPEN(filename) << ": " << std::strerror(errno) << std::endl;
+        output << ERR_STR_FILE_OPEN(filename) << ": " << strerror(errno) << endl;
     }
     else
     {
@@ -76,28 +74,28 @@ extern void SERVICES_RunImportPasswords(passwords::PasswordManager& manager, Str
             vector<Login_t> newLogins;
             if (csv::CSV_GetLoginsFromFile(file, newLogins))
             {
-                RunAddLogins(newLogins, manager);
+                RunAddLogins(newLogins, manager, output);
             }
             else
             {
-                throw std::runtime_error(ERR_STR_FILE);
+                throw runtime_error(ERR_STR_FILE);
             }
 
         }
-        catch(std::exception& ex)
+        catch(exception& ex)
         {
-            std::cout << ex.what() << std::endl;
+            output << ex.what() << endl;
         }
         catch(...)
         {
-            std::cout << current_exception().__cxa_exception_type()->name() << std::endl;
+            output << current_exception().__cxa_exception_type()->name() << endl;
         }
     }
 
     file.close();
 }
 
-extern void SERVICES_RunExportPasswords(passwords::PasswordManager& manager, StringVector_t args)
+extern void SERVICES_RunExportPasswords(passwords::PasswordManager& manager, ostream& output, istream& input, StringVector_t args)
 {
     string filename;
 
@@ -107,36 +105,36 @@ extern void SERVICES_RunExportPasswords(passwords::PasswordManager& manager, Str
     }
     else
     {
-        cout << ERR_STR_ARG << endl;
+        output << ERR_STR_ARG << endl;
         return;
     }
 
     if (FileExists(filename))
     {
-        std::cout << ERR_STR_FILE_EXISTS(filename) << std::endl;
+        output << ERR_STR_FILE_EXISTS(filename) << endl;
         return;
     }
     
-    ofstream file(filename, std::ios::out | std::ios::trunc);
+    ofstream file(filename, ios::out | ios::trunc);
     
     if (!file.good())
     {
-        std::cout << ERR_STR_FILE_OPEN(filename) << "': " << std::strerror(errno) << std::endl;
+        output << ERR_STR_FILE_OPEN(filename) << "': " << strerror(errno) << endl;
     }
     else
     {
         try
         {
-            cout << PROMPT_STR_WRITING_FILE(filename) << std::endl;
+            output << PROMPT_STR_WRITING_FILE(filename) << endl;
             csv::CSV_SetLoginsToFile(file, manager.GetLoginVector());
         }
-        catch(std::exception& ex)
+        catch(exception& ex)
         {
-            std::cout << ex.what() << std::endl;
+            output << ex.what() << endl;
         }
         catch(...)
         {
-            std::cout << ERR_STR_GENERIC << std::endl;
+            output << ERR_STR_GENERIC << endl;
         }
     }
 

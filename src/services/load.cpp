@@ -16,7 +16,6 @@
 #include "project_definitions.hpp"
 
 #include <fstream>
-#include <iostream>
 #include <cstring>
 #include <cerrno>
 
@@ -29,7 +28,7 @@ using namespace std;
 #define FILE_PROMPT "Enter input filename (empty for default): "
 #define DEFAULT_FILE_NAME "manager_container.crypt"
 
-static void RunAddLogins(const vector<Login_t>& logins, PasswordManager& manager)
+static void RunAddLogins(const vector<Login_t>& logins, PasswordManager& manager, ostream& output)
 {
     size_t ok = 0, fail = 0;
     for (auto l: logins)
@@ -37,10 +36,10 @@ static void RunAddLogins(const vector<Login_t>& logins, PasswordManager& manager
         manager.AddLogin(l) ? ok++ : fail++;
     }
 
-    cout << "Parsed " << logins.size() << " logins, " << ok << " added, " << fail << " rejected." << endl;
+    output << "Parsed " << logins.size() << " logins, " << ok << " added, " << fail << " rejected." << endl;
 }
 
-void SERVICES_RunLoadPasswords(passwords::PasswordManager& manager, StringVector_t args)
+void SERVICES_RunLoadPasswords(passwords::PasswordManager& manager, ostream& output, istream&, StringVector_t args)
 {
     string password;
     string filename = DEFAULT_FILE_NAME;
@@ -56,38 +55,38 @@ void SERVICES_RunLoadPasswords(passwords::PasswordManager& manager, StringVector
     }
     else
     {
-        cout << ERR_STR_ARG << endl;
+        output << ERR_STR_ARG << endl;
         return;
     }
 
-    std::ifstream inputFile(filename, std::ios_base::in | std::ios_base::binary);
+    ifstream inputFile(filename, ios_base::in | ios_base::binary);
 
     if (inputFile.good())
     {
         try
         {
             CryptFile crypt(password);
-            std::vector<passwords::Login_t> logins;
+            vector<Login_t> logins;
 
             if(!crypt.Load(inputFile, logins))
             {
                 throw runtime_error("Failed decryption");
             }
 
-            RunAddLogins(logins, manager);
+            RunAddLogins(logins, manager, output);
         }
-        catch(std::exception& ex)
+        catch(exception& ex)
         {
-            std::cout << ex.what() << std::endl;
+            output << ex.what() << endl;
         }
         catch(...)
         {
-            std::cout << current_exception().__cxa_exception_type()->name() << std::endl;
+            output << current_exception().__cxa_exception_type()->name() << endl;
         }
     }
     else
     {
-        std::cout << ERR_STR_FILE_OPEN(filename) << "': " << std::strerror(errno) << std::endl;
+        output << ERR_STR_FILE_OPEN(filename) << "': " << strerror(errno) << endl;
     }
 
     inputFile.close();

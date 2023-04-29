@@ -17,7 +17,6 @@
 #include "services/idservice.hpp"
 
 #include <fstream>
-#include <iostream>
 #include <cstring>
 #include <cerrno>
 
@@ -27,10 +26,10 @@ using namespace fileops;
 using namespace passwords;
 using namespace std;
 
-static bool CheckFileCanBeWritten(string filename)
+static bool CheckFileCanBeWritten(string filename, ostream& output, istream& input)
 {
     bool allowWrite = false;
-    ifstream file(filename, std::ios::in | std::ios::ate | std::ios::binary);
+    ifstream file(filename, ios::in | ios::ate | ios::binary);
 
     if (file)
     {
@@ -49,17 +48,17 @@ static bool CheckFileCanBeWritten(string filename)
             {
                 // This file has previously been loaded to the manager. Allow overwrite
                 allowWrite = true;
-                cout << "File '" << filename << "' already exists and has been loaded previously. Overwriting!" << endl;
+                output << "File '" << filename << "' already exists and has been loaded previously. Overwriting!" << endl;
             }
             else if (IDSERVICE_IsApplicationHeader(header))
             {
-                cout << "WARNING: Container '" << filename << "' already exists and has not been loaded previously!" << endl;
-                cout << "Confirm overwrite (yes): ";
+                output << "WARNING: Container '" << filename << "' already exists and has not been loaded previously!" << endl;
+                output << "Confirm overwrite (yes): ";
 
-                string input;
-                getline(cin, input);
+                string inputStr;
+                getline(input, inputStr);
 
-                if (input == "yes")
+                if (inputStr == "yes")
                 {
                     allowWrite = true;
                 }
@@ -82,7 +81,7 @@ static bool CheckFileCanBeWritten(string filename)
     return allowWrite;
 }
 
-void SERVICES_RunSavePasswords(passwords::PasswordManager& manager, StringVector_t args)
+void SERVICES_RunSavePasswords(passwords::PasswordManager& manager, ostream& output, istream& input, StringVector_t args)
 {
     string filename = DEFAULT_FILE_NAME;
     string password;
@@ -98,19 +97,19 @@ void SERVICES_RunSavePasswords(passwords::PasswordManager& manager, StringVector
     }
     else
     {
-        cout << ERR_STR_ARG << endl;
+        output << ERR_STR_ARG << endl;
         return;
     }
 
-    if (CheckFileCanBeWritten(filename))
+    if (CheckFileCanBeWritten(filename, output, input))
     {
-        std::ofstream outputFile(filename, std::ios_base::trunc | std::ios_base::out | std::ios_base::binary);
+        ofstream outputFile(filename, ios_base::trunc | ios_base::out | ios_base::binary);
 
         try
         {
             if (outputFile.good())
             {
-                std::cout << PROMPT_STR_WRITING_FILE(filename) << std::endl;
+                output << PROMPT_STR_WRITING_FILE(filename) << endl;
                 CryptFile crypt(password);
 
                 if (crypt.Save(outputFile, manager.GetLoginVector()))
@@ -120,23 +119,23 @@ void SERVICES_RunSavePasswords(passwords::PasswordManager& manager, StringVector
             }
             else
             {
-                std::cout << ERR_STR_FILE_OPEN(filename) << std::strerror(errno) << std::endl;
+                output << ERR_STR_FILE_OPEN(filename) << strerror(errno) << endl;
             }
         }
-        catch(std::exception& ex)
+        catch(exception& ex)
         {
-            std::cout << ex.what() << std::endl;
+            output << ex.what() << endl;
         }
         catch(...)
         {
-            std::cout << current_exception().__cxa_exception_type()->name() << std::endl;
+            output << current_exception().__cxa_exception_type()->name() << endl;
         }
 
         outputFile.close();
     }
     else
     {
-        cout << ERR_STR_FILE << endl;
+        output << ERR_STR_FILE << endl;
     }
 
 }

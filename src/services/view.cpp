@@ -11,7 +11,6 @@
 
 #include "services/managerservices.hpp"
 #include "project_definitions.hpp"
-#include <iostream>
 #include <iomanip>
 
 using namespace passwords;
@@ -24,22 +23,22 @@ using namespace std;
 #define PASSWORD_WIDTH      (20)
 #define URL_DISPLAY_WIDTH   (30)
 
-static void PrintLogin(const size_t idx, const Login& login)
+static void PrintLogin(const size_t idx, const Login& login, ostream& output)
 {
-    cout << setw(IDX_WIDTH) << to_string(idx) << " | ";
-    cout << setw(USER_WIDTH) << login.username << " | ";
-    cout << setw(PASSWORD_WIDTH) << login.password << " | ";
+    output << setw(IDX_WIDTH) << to_string(idx) << " | ";
+    output << setw(USER_WIDTH) << login.username << " | ";
+    output << setw(PASSWORD_WIDTH) << login.password << " | ";
 
     if (login.url.size() > URL_DISPLAY_WIDTH)
     {
-        cout << login.url.substr(0U ,URL_DISPLAY_WIDTH) << "...";
+        output << login.url.substr(0U ,URL_DISPLAY_WIDTH) << "...";
     }
     else
     {
-        cout << login.url;
+        output << login.url;
     }
 
-    cout << endl;
+    output << endl;
 }
 
 static bool MatchToLogin(const string& key, const Login_t& login)
@@ -50,13 +49,13 @@ static bool MatchToLogin(const string& key, const Login_t& login)
     return urlMatch || nameMatch;
 }
 
-void SERVICES_RunViewPasswords(passwords::PasswordManager& manager, StringVector_t args)
+void SERVICES_RunViewPasswords(passwords::PasswordManager& manager, std::ostream& output, std::istream&, StringVector_t args)
 {
     const size_t count = manager.Count();
 
     if (count == 0)
     {
-        cout << "No login information loaded" << endl;
+        output << "No login information loaded" << endl;
     }
     else
     {
@@ -89,22 +88,22 @@ void SERVICES_RunViewPasswords(passwords::PasswordManager& manager, StringVector
             {
                 for (size_t i = startIdx; (i < count) && (i < endIdx); i++)
                 {
-                    PrintLogin(i, manager[i]);
+                    PrintLogin(i, manager[i], output);
                 }
             }
             else
             {
-                cout << ERR_STR_IDX << endl;
+                output << ERR_STR_IDX << endl;
             }
         }
         catch (...)
         {
-            cout << ERR_STR_ARG << endl;
+            output << ERR_STR_ARG << endl;
         }
     }
 }
 
-void SERVICES_RunFindPassword(passwords::PasswordManager& manager, StringVector_t args)
+void SERVICES_RunFindPassword(passwords::PasswordManager& manager, std::ostream& output, std::istream&, StringVector_t args)
 {
     try
     {
@@ -115,7 +114,7 @@ void SERVICES_RunFindPassword(passwords::PasswordManager& manager, StringVector_
                 Login_t login = manager[i];
                 if (MatchToLogin(args[1], login))
                 {
-                    PrintLogin(i, login);
+                    PrintLogin(i, login, output);
                 }
             }
         }
@@ -126,11 +125,11 @@ void SERVICES_RunFindPassword(passwords::PasswordManager& manager, StringVector_
     }
     catch (...)
     {
-        cout << ERR_STR_ARG << endl;
+        output << ERR_STR_ARG << endl;
     }
 }
 
-void SERVICES_RunRemovePassword(passwords::PasswordManager& manager, StringVector_t args)
+void SERVICES_RunRemovePassword(passwords::PasswordManager& manager, std::ostream& output, std::istream&, StringVector_t args)
 {
     const size_t count = manager.Count();
 
@@ -144,7 +143,7 @@ void SERVICES_RunRemovePassword(passwords::PasswordManager& manager, StringVecto
                 if (manager.RemoveLogin(idx))
                 {
                     manager.SetDataSaved(false);
-                    cout << "Removed login number " << idx << endl;
+                    output << "Removed login number " << idx << endl;
                 }
             }
             else
@@ -159,6 +158,6 @@ void SERVICES_RunRemovePassword(passwords::PasswordManager& manager, StringVecto
     }
     catch (...)
     {
-        cout << ERR_STR_ARG << endl;
+        output << ERR_STR_ARG << endl;
     }
 }

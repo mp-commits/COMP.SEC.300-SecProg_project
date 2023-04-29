@@ -36,7 +36,7 @@ using namespace std;
 #define COMMAND_VIEW    "view"
 
 static bool MatchCommand(const string& input, const string command, size_t matchIndex);
-static void DisplayHelp(PasswordManager&, StringVector_t args);
+static void DisplayHelp(PasswordManager&, std::ostream& output, std::istream& input, StringVector_t args);
 static StringVector_t GetArgs(string s, string delimiter);
 static void PrintError(string msg);
 static bool TryRunCommand(PasswordManager& manager, string command, StringVector_t& args, bool& exit);
@@ -45,7 +45,7 @@ typedef struct
 {
     size_t letterAccessIdx;
     const string cmd;
-    function<void(passwords::PasswordManager&, StringVector_t)> func;
+    function<void(passwords::PasswordManager&, std::ostream& output, std::istream& input, StringVector_t)> func;
     const string description;
     const StringVector_t params;
 } CommandDescription_t;
@@ -53,11 +53,11 @@ typedef struct
 static const CommandDescription_t COMMANDS[] = {
     {0U, COMMAND_ADD,       SERVICES_RunAddPassword,        "Add a password to the manager",            {""}},
     {0U, COMMAND_COPY,      SERVICES_RunCopyPassword,       "Copy a password to clipboard",             {"[idx]"}},
-    {0U, COMMAND_SAVE,      SERVICES_RunSavePasswords,      "Save passwords to an encrypted file",      {"", "[password]", "[file] [password]"}},
+    {0U, COMMAND_SAVE,      SERVICES_RunSavePasswords,      "Save passwords to an encrypted file",      {"[password]", "[file] [password]"}},
     {1U, COMMAND_EXIT,      nullptr,                        "Exit the program",                         {""}},
-    {0U, COMMAND_EXPORT,    SERVICES_RunExportPasswords,    "Export passwords to a csv file",           {"", "[file]"}},
-    {0U, COMMAND_IMPORT,    SERVICES_RunImportPasswords,    "Import passwords from a csv file",         {"", "[file]"}},
-    {0U, COMMAND_LOAD,      SERVICES_RunLoadPasswords,      "Load passwords from an encrypted file",    {"", "[password]", "[file] [password]"}},
+    {0U, COMMAND_EXPORT,    SERVICES_RunExportPasswords,    "Export passwords to a csv file",           {"[file]"}},
+    {0U, COMMAND_IMPORT,    SERVICES_RunImportPasswords,    "Import passwords from a csv file",         {"[file]"}},
+    {0U, COMMAND_LOAD,      SERVICES_RunLoadPasswords,      "Load passwords from an encrypted file",    {"[password]", "[file] [password]"}},
     {0U, COMMAND_REMOVE,    SERVICES_RunRemovePassword,     "Removes password with a specific index",   {"[idx]"}},
     {0U, COMMAND_VIEW,      SERVICES_RunViewPasswords,      "View existing passwords",                  {"", "[page]", "[idx from] [idx to]"}},
     {0U, COMMAND_FIND,      SERVICES_RunFindPassword,       "Find a passwords by string",               {"[search key]"}},
@@ -77,7 +77,7 @@ static bool MatchCommand(const string& input, const string command, size_t match
     return exactMatch || letterMatch;
 }
 
-static void DisplayHelp(PasswordManager&, StringVector_t args)
+static void DisplayHelp(PasswordManager&, std::ostream& output, std::istream&, StringVector_t args)
 {
     string cmd = "";
     if (args.size() > 1)
@@ -86,20 +86,20 @@ static void DisplayHelp(PasswordManager&, StringVector_t args)
     }
     else
     {
-        cout << "To view specific command run 'help [comamnd]'" << endl;
-        cout << "Supported commands:" << endl;
+        output << "To view specific command run 'help [comamnd]'" << endl;
+        output << "Supported commands:" << endl;
     }
 
     for (auto c: COMMANDS)
     {
         if ((cmd == "") || MatchCommand(cmd, c.cmd, c.letterAccessIdx))
         {
-            cout << c.cmd << ", " << c.cmd[c.letterAccessIdx] << " : " << c.description << ". Usage:" << endl;
+            output << c.cmd << ", " << c.cmd[c.letterAccessIdx] << " : " << c.description << ". Usage:" << endl;
             for (auto param : c.params)
             {
-                cout << "    " << c.cmd << " " << param << endl;
+                output << "    " << c.cmd << " " << param << endl;
             }
-            cout << endl;
+            output << endl;
         }
     }
 }
@@ -153,6 +153,7 @@ static void PrintError(string msg)
 
 static bool TryRunCommand(PasswordManager& manager, string command, StringVector_t& args, bool& exit)
 {
+    static bool unsavedPrompted = false;
     bool success = true;
 
     try
@@ -160,12 +161,15 @@ static bool TryRunCommand(PasswordManager& manager, string command, StringVector
         if (MatchCommand(command, COMMAND_EXIT, 1))
         {
             // Check for exit command first
-            if (!manager.GetDataSaved())
+            if (!manager.GetDataSaved() && !unsavedPrompted)
             {
-                PrintError("Unsaved data in the manager. Running save service.");
-                SERVICES_RunSavePasswords(manager, args);
+                PrintError("Unsaved data in the manager. Consider running save service.");
+                unsavedPrompted = true;
             }
-            exit = true;
+            else
+            {
+                exit = true;
+            }
         }
         else
         {
@@ -176,7 +180,7 @@ static bool TryRunCommand(PasswordManager& manager, string command, StringVector
             {
                 if (MatchCommand(command, c.cmd, c.letterAccessIdx))
                 {
-                    c.func(manager, args);
+                    c.func(manager, cout, cin, args);
 
                     success = true;
                     break;
@@ -210,7 +214,7 @@ void CLI_RunCli(passwords::PasswordManager& manager, StringVector_t args)
         getline(cin, input);
         StringVector_t args = GetArgs(input, CLI_ARG_DELIM);
         ValidateArgs(args);
-        
+
         if (args.size() == 0)
         {
             PrintError(CLI_ERROR_MESSAGE(input));

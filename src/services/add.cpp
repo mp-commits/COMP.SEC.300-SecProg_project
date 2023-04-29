@@ -11,35 +11,34 @@
 
 #include "services/managerservices.hpp"
 #include "project_definitions.hpp"
-#include <iostream>
 
 using namespace passwords;
 using namespace std;
 
-void SERVICES_RunAddPassword(passwords::PasswordManager& manager, StringVector_t args)
+void SERVICES_RunAddPassword(passwords::PasswordManager& manager, std::ostream& output, std::istream& input, StringVector_t args)
 {
     string name = "";
     string domain = "";
     string password = "";
 
-    cout << PROMPT_STR_NAME;
-    getline(cin, name);
+    output << PROMPT_STR_NAME;
+    getline(input, name);
 
-    cout << PROMPT_STR_DOMAIN;
-    getline(cin, domain);
+    output << PROMPT_STR_DOMAIN;
+    getline(input, domain);
 
-    cout << PROMPT_STR_PASSWORD;
-    getline(cin, password);
+    output << PROMPT_STR_PASSWORD;
+    getline(input, password);
 
     if (name.empty() && domain.empty())
     {
-        cout << ERROR_STR_EMPTY_ID << endl;
+        output << ERROR_STR_EMPTY_ID << endl;
         return;
     }
 
     if (password.empty())
     {
-        cout << ERROR_STR_EMPTY_PASSWORD << endl;
+        output << ERROR_STR_EMPTY_PASSWORD << endl;
         return;
     }
 
