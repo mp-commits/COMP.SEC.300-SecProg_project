@@ -12,7 +12,8 @@
 #ifndef CRYPTFILE_HPP
 #define CRYPTFILE_HPP
 
-#include <fstream>
+#include <istream>
+#include <ostream>
 #include "encryption/encryption.hpp"
 #include "passwords/passwords.hpp"
 #include "bytevector.hpp"
@@ -25,8 +26,8 @@ public:
     CryptFile(const std::string& password);
     ~CryptFile();
 
-    bool Load(std::ifstream& file, std::vector<passwords::Login_t>& logins);
-    bool Save(std::ofstream& file, const std::vector<passwords::Login_t>& logins);
+    bool Load(std::istream& file, std::vector<passwords::Login_t>& logins);
+    bool Save(std::ostream& file, const std::vector<passwords::Login_t>& logins);
 
 private:
     std::string         m_password;
@@ -36,4 +37,5 @@ private:
 };
 
 } // namespace fileops
-#endif
+
+#endif // CRYPTFILE_HPP

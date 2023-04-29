@@ -148,7 +148,7 @@ CryptFile::~CryptFile()
 
 }
 
-bool CryptFile::Load(ifstream& file, vector<passwords::Login_t>& logins)
+bool CryptFile::Load(istream& file, vector<passwords::Login_t>& logins)
 {
     file.seekg(0, ios_base::end);
     size_t fileSize = file.tellg();
@@ -214,7 +214,7 @@ bool CryptFile::Load(ifstream& file, vector<passwords::Login_t>& logins)
     return true;
 }
 
-bool CryptFile::Save(ofstream& file, const vector<passwords::Login_t>& logins)
+bool CryptFile::Save(ostream& file, const vector<passwords::Login_t>& logins)
 {
     if (!logins.empty())
     {
@@ -298,7 +298,7 @@ void CryptFile::WriteChecksum(ByteVector_t& data)
     }
 }
 
-bool csv::CSV_GetLoginsFromFile(ifstream& file, vector<passwords::Login_t>& logins)
+bool csv::CSV_GetLoginsFromFile(istream& file, vector<passwords::Login_t>& logins)
 {
     string line;
     KeyMap_t keys;
@@ -341,7 +341,7 @@ bool csv::CSV_GetLoginsFromFile(ifstream& file, vector<passwords::Login_t>& logi
     return success;
 }
 
-bool csv::CSV_SetLoginsToFile(ofstream& file, const vector<passwords::Login_t>& logins)
+bool csv::CSV_SetLoginsToFile(ostream& file, const vector<passwords::Login_t>& logins)
 {
     try 
     {
