@@ -14,6 +14,8 @@
 #include <climits>
 
 #include "encryption/encryption.hpp"
+#include "encryption/sha256.hpp"
+#include "encryption/util.hpp"
 
 using namespace encryption;
 using std::vector;
@@ -52,6 +54,74 @@ TEST(TEST_SUITE_NAME, deriveKey)
 
     EXPECT_EQ(key, key2);
     EXPECT_NE(key, key3);
+}
+
+TEST(TEST_SUITE_NAME, deriveWithEmptySalt)
+{
+    const string password = "SecretKey";
+    const ByteVector_t salt = {};
+    const ByteVector_t salt2 = {0}; // 0 salt should be the same as {}
+    const ByteVector_t salt3 = {1};
+
+    EVPKDF der(password, salt);
+    EVPKDF der2(password, salt2);
+    EVPKDF der3(password, salt3);
+
+    ENCRYPTION_Key128_t key;
+    der.derive128(key);
+    ENCRYPTION_Key128_t key2;
+    der2.derive128(key2);
+    ENCRYPTION_Key128_t key3;
+    der3.derive128(key3);
+
+    EXPECT_EQ(key, key2);
+    EXPECT_NE(key, key3);
+}
+
+TEST(TEST_SUITE_NAME, sha256empty)
+{
+    const ByteVector_t expected = {
+        0xe3, 0xb0, 0xc4, 0x42, 0x98, 0xfc, 0x1c, 0x14, 
+        0x9a, 0xfb, 0xf4, 0xc8, 0x99, 0x6f, 0xb9, 0x24, 
+        0x27, 0xae, 0x41, 0xe4, 0x64, 0x9b, 0x93, 0x4c, 
+        0xa4, 0x95, 0x99, 0x1b, 0x78, 0x52, 0xb8, 0x55
+    };
+
+    auto actual = encryption::CalculateSHA256(encryptionUtil::StringToVector(""));
+
+    EXPECT_EQ(expected, actual);
+}
+
+TEST(TEST_SUITE_NAME, sha256basic)
+{
+    const std::string hello = "HelloWorld";
+
+    const ByteVector_t expected = {
+        0x87, 0x2e, 0x4e, 0x50, 0xce, 0x99, 0x90, 0xd8, 
+        0xb0, 0x41, 0x33, 0x0c, 0x47, 0xc9, 0xdd, 0xd1,
+        0x1b, 0xec, 0x6b, 0x50, 0x3a, 0xe9, 0x38, 0x6a,
+        0x99, 0xda, 0x85, 0x84, 0xe9, 0xbb, 0x12, 0xc4
+    };
+
+    auto actual = encryption::CalculateSHA256(encryptionUtil::StringToVector(hello));
+
+    EXPECT_EQ(expected, actual);
+}
+
+TEST(TEST_SUITE_NAME, sha256invalid)
+{
+    const std::string hello = "HelloWorld";
+
+    const ByteVector_t expected = {
+        0x87, 0x2e, 0x4e, 0x50, 0xce, 0x99, 0x90, 0xd8, 
+        0xb0, 0x41, 0x33, 0x0c, 0x47, 0xc9, 0xdd, 0xd1,
+        0x1b, 0xec, 0x6b, 0x50, 0x3a, 0xe9, 0x38, 0x6a,
+        0x99, 0xda, 0x85, 0x84, 0xe9, 0xbb, 0x12, 0xc4
+    };
+
+    auto actual = encryption::CalculateSHA256(encryptionUtil::StringToVector(hello + " "));
+
+    EXPECT_NE(expected, actual);
 }
 
 TEST(TEST_SUITE_NAME, invalidInput)

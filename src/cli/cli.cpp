@@ -39,7 +39,7 @@ static bool MatchCommand(const string& input, const string command, size_t match
 static void DisplayHelp(PasswordManager&, std::ostream& output, std::istream& input, StringVector_t args);
 static StringVector_t GetArgs(string s, string delimiter);
 static void PrintError(string msg);
-static bool TryRunCommand(PasswordManager& manager, string command, StringVector_t& args, bool& exit);
+static bool TryRunCommand(PasswordManager& manager, StringVector_t& args, bool& exit);
 
 typedef struct 
 {
@@ -131,7 +131,7 @@ static StringVector_t GetArgs(string s, string delimiter)
 
 static void ValidateArgs(StringVector_t& vec)
 {
-    const std::string allowedCharacters = "abcdefghijklmnopqrstuvwxyzäöåABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÅ0123456789()_-,.*/\\:;";
+    const std::string allowedCharacters = "abcdefghijklmnopqrstuvwxyzäöåABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÅ0123456789()_-,./\\:;";
 
     for (auto& s: vec)
     {
@@ -151,13 +151,15 @@ static void PrintError(string msg)
     cout << msg << endl;
 }
 
-static bool TryRunCommand(PasswordManager& manager, string command, StringVector_t& args, bool& exit)
+static bool TryRunCommand(PasswordManager& manager, StringVector_t& args, bool& exit)
 {
     static bool unsavedPrompted = false;
     bool success = true;
 
     try
     {
+        string command = args[0];
+
         if (MatchCommand(command, COMMAND_EXIT, 1))
         {
             // Check for exit command first
@@ -202,31 +204,38 @@ void CLI_RunCli(passwords::PasswordManager& manager, StringVector_t args)
     string input = "";
     string command = "";
 
+    ValidateArgs(args);
     if (!args.empty())
     {
-        string command = args[0];
-        TryRunCommand(manager, command, args, exit);
+        TryRunCommand(manager, args, exit);
     }
 
     while (!exit)
     {
-        cout << CLI_HEADER;
-        getline(cin, input);
-        StringVector_t args = GetArgs(input, CLI_ARG_DELIM);
-        ValidateArgs(args);
-
-        if (args.size() == 0)
+        try
         {
-            PrintError(CLI_ERROR_MESSAGE(input));
-            continue;
+            cout << CLI_HEADER;
+            getline(cin, input);
+            StringVector_t args = GetArgs(input, CLI_ARG_DELIM);
+            ValidateArgs(args);
+
+            if (args.size() == 0)
+            {
+                PrintError(CLI_ERROR_MESSAGE(input));
+                continue;
+            }
+
+            bool success = TryRunCommand(manager, args, exit);
+
+            if (!success)
+            {
+                PrintError(CLI_ERROR_MESSAGE(input));
+            }
         }
-
-        string command = args[0];
-        bool success = TryRunCommand(manager, command, args, exit);
-
-        if (!success)
+        catch(...)
         {
-            PrintError(CLI_ERROR_MESSAGE(input));
+            exit = true;
+            std::cout << "Unexpected: " << current_exception().__cxa_exception_type()->name() << " Exiting..." << std::endl;
         }
     }
 }
