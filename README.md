@@ -1,11 +1,13 @@
 # COMP.SEC.300-SecProg_project
 Project work for the course COMP.SEC.300-2022-2023-1 Secure Programming
 
-## Reqirements
+For detailed documentation see report.pdf!
+
+## Requirements
 
 - CMake 3.11 or newer. Tested with version 3.20
 - Ninja build
-- OpenSSL 3.0. Tested with 3.0.4 (Linux) and 3.0.8 (Windows). See build istructions.
+- OpenSSL 3.0. Tested with 3.0.4 (Linux) and 3.0.8 (Windows). See build instructions.
 - Git installed such that git is available command in PATH.
 - Internet connection. CMake needs to fetch libraries from GitHub.
 
@@ -58,29 +60,25 @@ ninja
 ## Supported commands:
 ```
 add, a : Add a password to the manager. Usage:
-    add
+    add 
 
 copy, c : Copy a password to clipboard. Usage:
     copy [idx]
 
-save, s : Save passwords to an encrypted file. Usage:
-    save
+save, s : Save passwords to an encrypted file. Usage:     
     save [password]
     save [file] [password]
 
 exit, x : Exit the program. Usage:
-    exit
+    exit 
 
-export, e : Export passwords to a csv file. Usage:
-    export
+export, e : Export passwords to a csv file. Usage:        
     export [file]
 
-import, i : Import passwords from a csv file. Usage:
-    import
+import, i : Import passwords from a csv file. Usage:      
     import [file]
 
-load, l : Load passwords from an encrypted file. Usage:
-    load
+load, l : Load passwords from an encrypted file. Usage:   
     load [password]
     load [file] [password]
 

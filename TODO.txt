@@ -1,4 +1,0 @@
-DONE: Empty user input validation
-DONE: Manual argument removal
-DONE: Unify argument count handling: Too many args -> what?
-DONE: Passwords cannot be empty
