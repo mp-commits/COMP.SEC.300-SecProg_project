@@ -13,7 +13,7 @@
 #include <iostream>
 #include <string>
 #include "cli/cli.hpp"
-#include "passwords/passwords.hpp"
+#include "manager/manager.hpp"
 #include "stringvector.hpp"
 #include "version.hpp"
 

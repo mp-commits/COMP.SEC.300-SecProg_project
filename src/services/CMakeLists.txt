@@ -32,6 +32,6 @@ target_link_libraries(${PROJECT_NAME}-static
         decap::clip
         encryption-static
         fileops-static
-        passwords-static
+        manager-static
         idservice-static
 )

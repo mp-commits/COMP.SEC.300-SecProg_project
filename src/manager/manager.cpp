@@ -1,5 +1,5 @@
 /**
- * @file passwords.cpp
+ * @file manager.cpp
  * @author your name (you@domain.com)
  * @brief 
  * @version 0.1
@@ -9,7 +9,7 @@
  * 
  */
 
-#include "passwords/passwords.hpp"
+#include "manager/manager.hpp"
 
 using namespace passwords;
 

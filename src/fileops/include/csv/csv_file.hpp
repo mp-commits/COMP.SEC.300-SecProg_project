@@ -14,7 +14,7 @@
 
 #include <istream>
 #include <ostream>
-#include "passwords/passwords.hpp"
+#include "manager/manager.hpp"
 
 namespace csv {
 

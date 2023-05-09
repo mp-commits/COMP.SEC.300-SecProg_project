@@ -34,5 +34,5 @@ add_executable(${EXECUTABLE_NAME} main.cpp ${CMAKE_CURRENT_BINARY_DIR}/git_versi
 target_link_libraries(${EXECUTABLE_NAME} 
     PRIVATE 
         cli-static
-        passwords-static
+        manager-static
 )

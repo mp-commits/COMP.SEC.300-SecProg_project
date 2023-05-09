@@ -15,7 +15,7 @@
 #include <istream>
 #include <ostream>
 #include "encryption/encryption.hpp"
-#include "passwords/passwords.hpp"
+#include "manager/manager.hpp"
 #include "bytevector.hpp"
 
 namespace fileops {

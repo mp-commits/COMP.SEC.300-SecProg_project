@@ -10,7 +10,7 @@ target_include_directories(${PROJECT_NAME}-static
 
 target_link_libraries(${PROJECT_NAME}-static
     PUBLIC
-        passwords-static
+        manager-static
     PRIVATE
         manager_services-static
 )

@@ -1,5 +1,5 @@
 add_subdirectory(cli)
 add_subdirectory(encryption)
 add_subdirectory(fileops)
-add_subdirectory(passwords)
+add_subdirectory(manager)
 add_subdirectory(services)

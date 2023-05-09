@@ -15,6 +15,6 @@ target_link_libraries(${PROJECT_NAME}-static
     PUBLIC
         Boost::tokenizer
         encryption-static
-        passwords-static
+        manager-static
         idservice-static
 )

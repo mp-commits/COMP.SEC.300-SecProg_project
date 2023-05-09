@@ -1,5 +1,5 @@
 /**
- * @file passwords.hpp
+ * @file manager.hpp
  * @author your name (you@domain.com)
  * @brief 
  * @version 0.1
@@ -9,8 +9,8 @@
  * 
  */
 
-#ifndef PASSWORDS_HPP
-#define PASSWORDS_HPP
+#ifndef MANAGER_HPP
+#define MANAGER_HPP
 
 #include <stdint.h>
 #include <string>
@@ -67,17 +67,12 @@ public:
         m_logins.clear();
     }
 
-    Login& operator[](int index)
+    Login operator[](int index)
     {
         return m_logins[index];
     }
 
     const std::vector<Login_t>& GetLoginVector() const
-    {
-        return m_logins;
-    }
-
-    std::vector<Login_t>& GetLoginVector()
     {
         return m_logins;
     }

@@ -14,7 +14,7 @@
 
 #include <istream>
 #include <ostream>
-#include "passwords/passwords.hpp"
+#include "manager/manager.hpp"
 #include "stringvector.hpp"
 
 extern void SERVICES_RunLoadPasswords(passwords::PasswordManager& manager, std::ostream& output, std::istream& input, StringVector_t args = {});
